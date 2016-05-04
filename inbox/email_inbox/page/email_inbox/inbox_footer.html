@@ -1,0 +1,15 @@
+<div class="row col-md-10" style="position:fixed;bottom:0px;padding-bottom:5px; background-color:#fff;left:(100/12)%;right: 5px">
+
+        <div class="col-xs-12">
+            <div class="">
+                <p style="float:left;margin-right: 10px">showing {%=cur_page*20 %} to {%=((cur_page+1)*20) <= data_length?(cur_page+1)*20:data_length%} of {%=data_length%}</p>
+            </div>
+            <div class="btn-group btn-group-paging">
+                <button type="button" class="btn" data-value="0"><i class="icon-double-angle-left icon-fixed-width  icon" ></i></button>
+                <button type="button" class="btn" data-value="{%=cur_page-1>=0?(cur_page-1):0 %}"><i class="icon-angle-left icon-fixed-width " ></i></button>
+                <button type="button" class="btn" data-value="{%=cur_page+1<=last_page?cur_page+1:last_page %}"><i class="icon-angle-right icon-fixed-width " ></i></button>
+                <button type="button" class="btn" data-value="{%=last_page%}"><i class="icon-double-angle-right icon-fixed-width " ></i></button>
+            </div>
+        </div>
+
+</div>
