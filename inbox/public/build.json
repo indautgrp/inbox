@@ -1,0 +1,5 @@
+{
+	"js/desk2.min.js": [
+		"public/js/frappe/views/communicationcomposeroverride.js"
+	]
+}

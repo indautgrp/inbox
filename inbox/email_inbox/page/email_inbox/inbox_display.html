@@ -34,12 +34,14 @@
                     {% if (frappe.model.can_read(\'Communication\')) { %}
                     </a>
                     {% } %}
+                    <a class="text-muted company-link pull-right"
+                        data-name="{%= data.name %}"> &ndash; {%= __("Match") %}</a>
 
                     <a class="text-muted relink-link pull-right"
-                        data-name="{%= data.name %}"> &ndash; {%= __("Relink") %}</a>
+                        data-name="{%= data.name %}"> {%= __("Relink") %}</a>
 
-                    <a class="text-muted reply-link pull-right"
-                        data-name="{%= data.name %}">{%= __("Reply") %}</a>
+                    <!--<a class="text-muted reply-link pull-right"
+                        data-name="{%= data.name %}">{%= __("Reply") &ndash;  %}</a>-->
                 {% } %}
                 <!--liked
                 <span class="comment-likes" data-liked-by=\'{{ JSON.stringify(data._liked_by) }}\'>

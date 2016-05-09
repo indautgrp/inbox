@@ -16,7 +16,9 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/inbox/css/inbox.css"
-# app_include_js = "/assets/inbox/js/inbox.js"
+#app_include_js = [
+#"assets/js/desk2.min.js",
+#]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/inbox/css/inbox.css"
@@ -85,15 +87,15 @@ notification_config = "inbox.email_inbox.notifications.get_notification_config"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+ #scheduler_events = {
 # 	"all": [
 # 		"inbox.tasks.all"
 # 	],
 # 	"daily": [
 # 		"inbox.tasks.daily"
 # 	],
-# 	"hourly": [
-# 		"inbox.tasks.hourly"
+#	"hourly": [
+#		"inbox.tasks.hourly"
 # 	],
 # 	"weekly": [
 # 		"inbox.tasks.weekly"

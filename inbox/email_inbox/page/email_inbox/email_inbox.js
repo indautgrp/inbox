@@ -41,25 +41,48 @@ frappe.Inbox= Class.extend({
 
 		this.render_sidemenu();
 		if (this.account) {
-			this.render_list();
 			this.render_footer();
+			this.render_list();
 			this.render_buttons();
 			this.init_select_all();
-			this.make_filters();
+			var me = this;
+			frappe.realtime.on("new_email", function(data) {
+				for(var i =0;i<me.accounts.length;i++) {
+					if (data.account == me.accounts[i]) {
+						frappe.utils.notify(data.account, "you have "+data.number+" new emails", {}, function () {
+							window.focus();
+							me.account = data.account;
+							$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
+							$('.inbox-item[data-account="' + data.account + '" ]').closest(".list-row").addClass("list-row-head").css("font-weight","bold");
+							me.render_list();
+							me.update_footer();
+						});
+						if(data.account == me.account) {
+							me.render_list();
+							me.update_footer();
+						}
+					}
+				}
+			});
+
+			//this.make_filters(); //hidden till fix
 		}else{
-			alert("no email account assigned to you")
+			alert("No Email Account assigned to you contact your System administrator");
+			if (frappe.session.user==="Administrator")
+			{
+				frappe.set_route("List","User");
+			}
+			else
+			{
+				window.history.back();
+			}
 		}
-
-
-		//this.get_paging()
-		//this.body.add_custom_button("",function(val){console.log(val)},'icon-angle-double-left','class')
     },
 	render_headers: function(){
         //$(cur_frm.fields_dict['inbox_list'].wrapper)
 		$(".layout-main-section-wrapper").css("padding-left","0px").css("padding-right","0px")
 		var data = {"start":this.start,"page_length":this.page_length.toString()}
 		this.headers = $(this.wrapper.page.main).append(frappe.render_template("inbox_headers", data))
-
     },
 	render_sidemenu: function () {
 		var me = this
@@ -70,38 +93,43 @@ frappe.Inbox= Class.extend({
 			callback:function(list){
 				var buttons = '<div class="layout-main-section">';
 				if (list["message"]){
-				me.account = list["message"][0]["email_account"];
-				buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " style="margin-left: 10px;">'+list["message"][0]["email_account"]+'</span> </div></div>';
-				for (var i = 1;i<list["message"].length;i++)
-				{
-					buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" style="margin-left: 10px;">'+list["message"][i]["email_account"]+'</span> </div></div>';
-				}
-				me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
-				$(".inbox-select").click(function(btn){
-					me.account = $(btn.currentTarget).find(".inbox-item").html();
-					$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
-					$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-					me.cur_page = 1;
-					$(".list-select-all").prop("checked",false);
-					me.render_list();
-					$(me.footer).bootstrapPaginator();
-				});
-
+					me.account = list["message"][0]["email_account"];
+					me.accounts = [];
+					me.accounts[0] = me.account;
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="'+list["message"][0]["email_id"]+'" data-account="'+list["message"][0]["email_account"]+'" style="margin-left: 10px;">'+list["message"][0]["email_id"]+'</span> </div></div>';
+					for (var i = 1;i<list["message"].length;i++)
+					{
+						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
+						me.accounts.push(list["message"][i]["email_account"])
+					}
+					me.render_footer()
+					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
+					$(".inbox-select").click(function(btn){
+						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
+						$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
+						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
+						me.cur_page = 1;
+						$(".list-select-all").prop("checked",false);
+						me.render_list();
+						me.update_footer();
+						
+					});
+	
 					//for mobile sidemenu
 					$(".form-sidebar").show();
 					$(".sidebar-left").find(".form-sidebar").append(buttons);
-				$(".inbox-select").click(function(btn){
-					console.log(btn)
-					me.account = $(btn.currentTarget).find(".inbox-item").html();
-					$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
-					$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-					me.cur_page = 1;
-					$(".list-select-all").prop("checked",false);
-					me.render_list();
-					me.render_footer()
-				});
-						//'<ul class="list-unstyled sidebar-menu standard-actions"><li><a>No rest</a></li></ul>'
-				me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
+
+					$(".form-sidebar").find(".inbox-select").click(function(btn){
+						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
+						$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
+						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
+						me.cur_page = 1;
+						$(".list-select-all").prop("checked",false);
+							me.render_list();
+							me.update_footer()
+					});
+							//'<ul class="list-unstyled sidebar-menu standard-actions"><li><a>No rest</a></li></ul>'
+					me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
 				}
 			}
         })
@@ -119,79 +147,52 @@ frappe.Inbox= Class.extend({
                 callback: function (list) {
 					me.data = {};
 					var data = list["message"];
-					for (var i =0;i<data.length;i++){
-						me.data[data[i].name]= data[i]
-					}
-					$(me.wrapper).find(".result-list").html("");
-					for (var i =0;i<data.length;i++)
-					//for (var item in me.data)
-					{
-						$(me.wrapper).find(".result-list").append(frappe.render_template("inbox_list", {data:data[i]}));//me.data[i]}));
-					}
-					$(me.wrapper).find(".doclist-row").click(function(btn){
-						if ($(btn.target).hasClass("noclick")){
-						return
+					if (data) {
+						for (var i = 0; i < data.length; i++) {
+							me.data[data[i].name] = data[i]
 						}
-						var name = $(btn.target).closest(".doclist-row").data("name");
-						if (me.data[name]["nomatch"]||me.data[name]["supplier"]||me.data[name]["customer"]) {
-							me.email_open(btn);
-						}else{
-							me.company_select(btn);
+						$(me.wrapper).find(".result-list").html("");
+						for (var i = 0; i < data.length; i++)
+							//for (var item in me.data)
+						{
+							$(me.wrapper).find(".result-list").append(frappe.render_template("inbox_list", {data: data[i]}));//me.data[i]}));
 						}
-					});
-					$(me.wrapper).find(".relink-link").click(function(btn){
-						var name = $(btn.target).closest(".doclist-row").data("name");
-						me.relink(name);
-					})
-
+						//click action
+						$(me.wrapper).find(".doclist-row").click(function (btn) {
+							if ($(btn.target).hasClass("noclick")) {
+								return
+							}
+							var name = $(btn.target).closest(".doclist-row").data("name");
+							if (!$(btn.target).hasClass("force-company") && (me.data[name]["nomatch"] || me.data[name]["timeline_doctype"])) {
+								me.email_open(name);
+							} else {
+								me.company_select(name);
+							}
+						});
+						$(me.wrapper).find(".relink-link").click(function (btn) {
+							var name = $(btn.target).closest(".doclist-row").data("name");
+							me.relink(name);
+						})
+					}else {
+						$(me.wrapper).find(".result-list").html("<div class='centered'>No Emails to Display</div>");
+					}
                 }
             })
     },
 	render_footer:function(){
 		var me = this;
-		frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.get_length',
-                args:{
-                    email_account:me.account
-                },
-                callback: function (r) {
-					me.data_length = r.message[0][0]
-					me.last_page = Math.ceil(r.message[0][0]/me.page_length);
-					var data = {"cur_page":me.cur_page,"last_page":me.last_page,"data_length":me.data_length};
-					//me.footer = $(me.wrapper).find(".footer");
-					me.footer = $(me.wrapper).append(' <footer class="footer" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6 hidden-xs"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
-					//me.footer.html(frappe.render_template("inbox_footer", data))
-
-					me.footer.bootstrapPaginator({
-						currentPage: 1,
-                		totalPages: 10,
-						bootstrapMajorVersion:3,
-						onPageClicked: function(e,originalEvent,type,page){
-							me.cur_page = page;
-							$('.footer-numbers').html('showing: '+(me.cur_page-1)*me.page_length+' to '+me.cur_page*me.page_length+' of '+me.data_length);
-							me.render_list();
-            			},
-
-					});
-
-					me.update_footer();
-
-
-					//$(me.wrapper.page.footer).html(frappe.render_template("inbox_footer", data))
-					// $(me.wrapper.page.footer).css("position","fixed")
-					//$(me.wrapper.page.footer).removeClass("hide");
-
-					//$(".navigation_group").html(frappe.render_template("inbox_footer", data))
-					//$(me.wrapper).find(".result-list").append(frappe.render_template("inbox_footer", data))
-
-
-					$(me.wrapper).find(".btn-group-paging .btn").click(function() {
-						me.cur_page = cint($(this).attr("data-value"));
-						me.render_list();
-						me.render_footer();
-					});
-                }
-            })
+		me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
+		me.footer.bootstrapPaginator({
+			currentPage: 1,
+			totalPages: 10,
+			bootstrapMajorVersion:3,
+			onPageClicked: function(e,originalEvent,type,page){
+				me.cur_page = page;
+				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
+				me.render_list();
+			},
+		});
+		me.update_footer();
 	},
 	update_footer:function(){
 		var me = this;
@@ -201,20 +202,22 @@ frappe.Inbox= Class.extend({
 				email_account: me.account
 			},
 			callback: function (r) {
-				me.data_length = r.message[0][0]
-				me.last_page = Math.ceil(r.message[0][0] / me.page_length);
-				me.footer.bootstrapPaginator({currentPage: 1, totalPages: me.last_page})
-				$('.footer-numbers').html('showing: '+(me.cur_page-1)*me.page_length+' to '+me.cur_page*me.page_length+' of '+me.data_length);
+				me.data_length = r.message[0][0];
+				if (me.data_length!=0) {
+					me.footer.show();
+					me.last_page = Math.ceil(r.message[0][0] / me.page_length);
+					me.footer.bootstrapPaginator({currentPage: 1, totalPages: me.last_page})
+				} else{
+					me.footer.hide();
+				}
+				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
 			}
 		})
 	},
-	company_select:function(btn)
+	company_select:function(name,nomatch)
 	{
 		var me = this;
-		var name = $(btn.target).closest(".doclist-row").data("name");
-		var d = new frappe.ui.Dialog ({
-			title: __("Match emails to a Company"),
-			fields: [{
+		/*var*/ fields = [{
 				"fieldtype": "Heading",
 				"label": __("Create new Contact for a Customer or Supplier to Match"),
 				"fieldname": "Option1"
@@ -227,16 +230,31 @@ frappe.Inbox= Class.extend({
 				},
 				{
 				"fieldtype": "Heading",
-				"label": __("Do not Match"),
+				"label": __("Replace Email on Contact"),
 				"fieldname": "Option2"
 				},
 				{
 					"fieldtype": "Button",
+					"label": __("Update Existing Contect"),
+					"fieldname":"updatecontact"
+				}
+				];
+		if (!nomatch) {
+			fields.push({
+				"fieldtype": "Heading",
+				"label": __("Do not Match"),
+				"fieldname": "Option3"
+				})
+			fields.push({
+					"fieldtype": "Button",
 					"label": __("Do not Match"),
 					"fieldname":"nomatch"
-				}]
+				})
+		}
+		var d = new frappe.ui.Dialog ({
+			title: __("Match emails to a Company"),
+			fields: fields
 		});
-
 		d.get_input("newcontact").on("click", function (frm) {
 			d.hide();
 			frappe.route_titles["create_contact"] = 1;
@@ -251,34 +269,36 @@ frappe.Inbox= Class.extend({
 					frappe.route_titles["create user account"]=1
 					frappe.set_route("Form", "Contact", doc.name);
 		});
-		d.get_input("nomatch").on("click", function (frm) {
+		d.get_input("updatecontact").on("click", function (frm) {
 			d.hide();
-			frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.setnomatch',
-                args:{
-                    name:name
-                }
-            });
-			me.data[name]["nomatch"]=1;
-			me.email_open(btn)
+			var name_split = me.data[name]["sender_full_name"].split(' ');
+			frappe.route_titles["update_contact"] = {
+						"email_id": me.data[name]["sender"]
+			};
+			frappe.set_route("List", "Contact");
 		});
+		if (!nomatch) {
+			d.get_input("nomatch").on("click", function (frm) {
+				d.hide();
+				frappe.call({
+					method: 'inbox.email_inbox.page.email_inbox.setnomatch',
+					args: {
+						name: name
+					}
+				});
+				me.data[name]["nomatch"] = 1;
+				if (!nomatch) {
+					me.email_open(name)
+				}
+			});
+		}
 		d.show();
 
 	},
-	email_open:function(btn)
+	email_open:function(name)
 	{
-		if (Object.keys($(btn.target).data()).length != 0){
-			var cell = $(btn.target).data()["filter"].split(",")[0];
-			if (cell =="reference_doctype"){
-				return
-			}
-			if (cell =="company"){
-				return
-			}
-		} 
 		var me = this;
 		var row ="";
-		var name = $(btn.currentTarget).data("name");
 		row = me.data[name];
 		//mark email as read
 		this.mark_read(this,name);
@@ -296,16 +316,16 @@ frappe.Inbox= Class.extend({
 
 		var c = me.prepare_email(row);
 		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_display",  {data:c}));
-		//emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_display",  {data:c}))
-		//$(".section-body").html(frappe.render_template("inbox_display",  {data:c}));
 
 		me.add_reply_btn_event(emailitem, c);
 		$(emailitem.fields_dict.email.$wrapper).find(".relink-link").on("click", function () {
 			me.relink(name);
 		});
+		$(emailitem.fields_dict.email.$wrapper).find(".company-link").on("click", function () {
+			me.company_select(name,true);
+		});
+		
 
-
-		//disabled only for testing bring it back/////////========================================================================================
 		$(".modal-dialog").addClass("modal-lg");
 		$(".modal-header").find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-10");
 		$(".modal-header").find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-2");
@@ -319,7 +339,7 @@ frappe.Inbox= Class.extend({
 
             // make the composer
             new frappe.views.CommunicationComposer({
-                doc: false,//me.frm.doc,
+                //doc: false,//me.frm.doc,
                 txt: "",
                 frm: false,//me.frm,
 				subject: "Re: "+ c.subject,
@@ -615,6 +635,7 @@ var link = me.wrapper.page.add_field({
     },
 	delete_email:function(me){
 		//could add flag to sync deletes but not going to
+		var names = me.action_checked_items('.data("name")')
 		me.action_checked_items('.parent().hide()')
 		me.update_local_flags(names,"deleted","1")
 	},
@@ -695,25 +716,7 @@ var link = me.wrapper.page.add_field({
 		return f;
 	},
 	///unused////////////////////////////
-	notifyUser:function (event) {
-		var title;
-		var options;
-
-		event.preventDefault();
-
-		if (event.target.id === 'button-wn-show-preset') {
-			title = 'Email received';
-			options = {
-				body: 'You have a total of 3 unread emails',
-				tag: 'preset',
-				icon: 'http://www.audero.it/favicon.ico'
-			};
-		} else {
-			title = document.getElementById('title').value;
-			options = {
-				body: document.getElementById('body').value,
-				tag: 'custom'
-			};
-		}
+	notifyUser:function () {
+		frappe.utils.notify("subject","body text here",{},function(){console.log("hi")})
 	}
 });
