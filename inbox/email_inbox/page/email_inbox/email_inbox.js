@@ -1,4 +1,3 @@
-//frappe.require('assets/inbox/js/lib/jquery.bootpag.min.js')
 frappe.require('assets/inbox/js/lib/bootstrap-paginator.min.js')
 
 frappe.pages['Email Inbox'].on_page_load = function(wrapper) {
