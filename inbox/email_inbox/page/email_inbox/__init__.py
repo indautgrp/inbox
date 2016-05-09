@@ -94,10 +94,13 @@ def get_length(email_account):
 
 @frappe.whitelist()
 def get_accounts(user):
-	return frappe.db.sql("""select email_account
-	from `tabUser Emails`
-	where parent = %(user)s
-	order by idx""",{"user":user},as_dict=1)
+	try:
+		return frappe.db.sql("""select email_account
+		from `tabUser Emails`
+		where parent = %(user)s
+		order by idx""",{"user":user},as_dict=1)
+	except:
+		return
 
 # for the selection/deletion of multiple items
 def set_multiple_status(names, status):

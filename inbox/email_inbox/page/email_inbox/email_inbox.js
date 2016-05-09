@@ -47,19 +47,22 @@ frappe.Inbox= Class.extend({
 			this.init_select_all();
 			this.make_filters();
 		}else{
-			alert("no email account assigned to you")
+			alert("No Email Account assigned to you contact your System administrator");
+			if (frappe.session.user==="Administrator")
+			{
+				frappe.set_route("List","User");
+			}
+			else
+			{
+				window.history.back();
+			}
 		}
-
-
-		//this.get_paging()
-		//this.body.add_custom_button("",function(val){console.log(val)},'icon-angle-double-left','class')
     },
 	render_headers: function(){
         //$(cur_frm.fields_dict['inbox_list'].wrapper)
 		$(".layout-main-section-wrapper").css("padding-left","0px").css("padding-right","0px")
 		var data = {"start":this.start,"page_length":this.page_length.toString()}
 		this.headers = $(this.wrapper.page.main).append(frappe.render_template("inbox_headers", data))
-
     },
 	render_sidemenu: function () {
 		var me = this
@@ -70,38 +73,38 @@ frappe.Inbox= Class.extend({
 			callback:function(list){
 				var buttons = '<div class="layout-main-section">';
 				if (list["message"]){
-				me.account = list["message"][0]["email_account"];
-				buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " style="margin-left: 10px;">'+list["message"][0]["email_account"]+'</span> </div></div>';
-				for (var i = 1;i<list["message"].length;i++)
-				{
-					buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" style="margin-left: 10px;">'+list["message"][i]["email_account"]+'</span> </div></div>';
-				}
-				me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
-				$(".inbox-select").click(function(btn){
-					me.account = $(btn.currentTarget).find(".inbox-item").html();
-					$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
-					$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-					me.cur_page = 1;
-					$(".list-select-all").prop("checked",false);
-					me.render_list();
-					$(me.footer).bootstrapPaginator();
-				});
-
-					//for mobile sidemenu
-					$(".form-sidebar").show();
-					$(".sidebar-left").find(".form-sidebar").append(buttons);
-				$(".inbox-select").click(function(btn){
-					console.log(btn)
-					me.account = $(btn.currentTarget).find(".inbox-item").html();
-					$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
-					$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-					me.cur_page = 1;
-					$(".list-select-all").prop("checked",false);
-					me.render_list();
-					me.render_footer()
-				});
-						//'<ul class="list-unstyled sidebar-menu standard-actions"><li><a>No rest</a></li></ul>'
-				me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
+					me.account = list["message"][0]["email_account"];
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " style="margin-left: 10px;">'+list["message"][0]["email_account"]+'</span> </div></div>';
+					for (var i = 1;i<list["message"].length;i++)
+					{
+						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" style="margin-left: 10px;">'+list["message"][i]["email_account"]+'</span> </div></div>';
+					}
+					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
+					$(".inbox-select").click(function(btn){
+						me.account = $(btn.currentTarget).find(".inbox-item").html();
+						$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
+						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
+						me.cur_page = 1;
+						$(".list-select-all").prop("checked",false);
+						me.render_list();
+						$(me.footer).bootstrapPaginator();
+					});
+	
+						//for mobile sidemenu
+						$(".form-sidebar").show();
+						$(".sidebar-left").find(".form-sidebar").append(buttons);
+					$(".inbox-select").click(function(btn){
+						console.log(btn)
+						me.account = $(btn.currentTarget).find(".inbox-item").html();
+						$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
+						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
+						me.cur_page = 1;
+						$(".list-select-all").prop("checked",false);
+						me.render_list();
+						me.render_footer()
+					});
+							//'<ul class="list-unstyled sidebar-menu standard-actions"><li><a>No rest</a></li></ul>'
+					me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
 				}
 			}
         })
