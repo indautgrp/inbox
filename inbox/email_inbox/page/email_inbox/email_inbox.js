@@ -166,7 +166,7 @@ frappe.Inbox= Class.extend({
                     email_account:me.account
                 },
                 callback: function (r) {
-					me.data_length = r.message[0][0]
+					me.data_length = r.message[0][0];
 					me.last_page = Math.ceil(r.message[0][0]/me.page_length);
 					var data = {"cur_page":me.cur_page,"last_page":me.last_page,"data_length":me.data_length};
 					me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6 hidden-xs"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
@@ -193,12 +193,13 @@ frappe.Inbox= Class.extend({
 				email_account: me.account
 			},
 			callback: function (r) {
-				me.data_length = r.message[0][0]
+				me.data_length = r.message[0][0];
 				if (me.data_length!=0) {
+					me.footer.show();
 					me.last_page = Math.ceil(r.message[0][0] / me.page_length);
 					me.footer.bootstrapPaginator({currentPage: 1, totalPages: me.last_page})
 				} else{
-
+					me.footer.hide();
 				}
 				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
 
