@@ -12,7 +12,7 @@ from frappe.desk.form.load import get_attachments
 @frappe.whitelist()
 def get_list(email_account,start,page_length):
 	inbox_list = []
-	communications = frappe.db.sql("""select name, sender, sender_full_name, actualdate, recipients, communication_medium as comment_type, subject, status ,reference_doctype,reference_name,customer,supplier,sent_or_received,uid,message_id, email_seen as seen,nomatch,has_attachment
+	communications = frappe.db.sql("""select name, sender, sender_full_name, actualdate, recipients, communication_medium as comment_type, subject, status ,reference_doctype,reference_name,customer,supplier,sent_or_received,uid,message_id, seen,nomatch,has_attachment
 				from tabCommunication
 				where email_account = %(email_account)s and deleted = 0
 				ORDER BY actualdate DESC

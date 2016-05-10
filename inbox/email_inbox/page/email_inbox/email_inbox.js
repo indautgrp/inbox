@@ -160,30 +160,18 @@ frappe.Inbox= Class.extend({
     },
 	render_footer:function(){
 		var me = this;
-		frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.get_length',
-                args:{
-                    email_account:me.account
-                },
-                callback: function (r) {
-					me.data_length = r.message[0][0];
-					me.last_page = Math.ceil(r.message[0][0]/me.page_length);
-					var data = {"cur_page":me.cur_page,"last_page":me.last_page,"data_length":me.data_length};
-					me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6 hidden-xs"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
-
-					me.footer.bootstrapPaginator({
-						currentPage: 1,
-                		totalPages: 10,
-						bootstrapMajorVersion:3,
-						onPageClicked: function(e,originalEvent,type,page){
-							me.cur_page = page;
-							$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
-							me.render_list();
-            			},
-					});
-					me.update_footer();
-                }
-            })
+		me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
+		me.footer.bootstrapPaginator({
+			currentPage: 1,
+			totalPages: 10,
+			bootstrapMajorVersion:3,
+			onPageClicked: function(e,originalEvent,type,page){
+				me.cur_page = page;
+				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
+				me.render_list();
+			},
+		});
+		me.update_footer();
 	},
 	update_footer:function(){
 		var me = this;
@@ -202,7 +190,6 @@ frappe.Inbox= Class.extend({
 					me.footer.hide();
 				}
 				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
-
 			}
 		})
 	},
@@ -225,8 +212,18 @@ frappe.Inbox= Class.extend({
 				},
 				{
 				"fieldtype": "Heading",
-				"label": __("Do not Match"),
+				"label": __("Replace Email on Contact"),
 				"fieldname": "Option2"
+				},
+				{
+					"fieldtype": "Button",
+					"label": __("Update Existing Contect"),
+					"fieldname":"updatecontact"
+				},
+				{
+				"fieldtype": "Heading",
+				"label": __("Do not Match"),
+				"fieldname": "Option3"
 				},
 				{
 					"fieldtype": "Button",
@@ -234,7 +231,6 @@ frappe.Inbox= Class.extend({
 					"fieldname":"nomatch"
 				}]
 		});
-
 		d.get_input("newcontact").on("click", function (frm) {
 			d.hide();
 			frappe.route_titles["create_contact"] = 1;
@@ -248,6 +244,14 @@ frappe.Inbox= Class.extend({
 					};
 					frappe.route_titles["create user account"]=1
 					frappe.set_route("Form", "Contact", doc.name);
+		});
+		d.get_input("updatecontact").on("click", function (frm) {
+			d.hide();
+			var name_split = me.data[name]["sender_full_name"].split(' ');
+			frappe.route_titles["update_contact"] = {
+						"email_id": me.data[name]["sender"]
+			};
+			frappe.set_route("List", "Contact");
 		});
 		d.get_input("nomatch").on("click", function (frm) {
 			d.hide();
@@ -317,7 +321,7 @@ frappe.Inbox= Class.extend({
 
             // make the composer
             new frappe.views.CommunicationComposer({
-                doc: false,//me.frm.doc,
+                //doc: false,//me.frm.doc,
                 txt: "",
                 frm: false,//me.frm,
 				subject: "Re: "+ c.subject,
