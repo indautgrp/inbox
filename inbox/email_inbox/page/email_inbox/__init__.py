@@ -43,6 +43,7 @@ def get_list(email_account,start,page_length):
 		inbox_list.append(comm)
 		#inbox_list[comm["name"]] = comm
 	return inbox_list
+
 @frappe.whitelist()
 def get_email_content(name):
 	docinfo = frappe.desk.form.load.get_attachments("Communication",name)
@@ -88,9 +89,12 @@ def update_local_flags(names,field,val):
 
 @frappe.whitelist()
 def get_length(email_account):
-	return frappe.db.sql("""select count(name)
-		from tabCommunication
-		where deleted = 0 and email_account= %(email_account)s""",{"email_account":email_account})
+	try:
+		return frappe.db.sql("""select count(name)
+			from tabCommunication
+			where deleted = 0 and email_account= %(email_account)s""",{"email_account":email_account})
+	except:
+		return 0
 
 @frappe.whitelist()
 def get_accounts(user):
