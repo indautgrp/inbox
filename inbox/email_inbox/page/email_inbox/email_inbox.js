@@ -177,7 +177,7 @@ frappe.Inbox= Class.extend({
 						bootstrapMajorVersion:3,
 						onPageClicked: function(e,originalEvent,type,page){
 							me.cur_page = page;
-							$('.footer-numbers').html('showing: '+(me.cur_page-1)*me.page_length+' to '+me.cur_page*me.page_length+' of '+me.data_length);
+							$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
 							me.render_list();
             			},
 					});
@@ -200,7 +200,7 @@ frappe.Inbox= Class.extend({
 				} else{
 
 				}
-				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + me.cur_page * me.page_length + ' of ' + me.data_length);
+				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + ((me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
 
 			}
 		})
