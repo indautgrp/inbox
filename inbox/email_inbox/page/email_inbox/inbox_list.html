@@ -15,16 +15,16 @@
                     </span>
                 </div>
 
-                <div class="col-sm-2 list-col text-ellipsis  hidden-xs">
+                <div class="col-sm-2 list-col text-ellipsis  hidden-xs {%= (data.customer || data.supplier)? "":"force-company" %}">
                     <span class="list-value">
                         <a class="filterable h6 text-muted grey noclick" data-filter="company,=,Commercial">{%= [data.customer,data.supplier].join(" ") %}</a>
                         <!--<a class="filterable h6 text-muted grey" data-filter="customer_group,=,Commercial">{%= data.supplier %}</a>-->
                     </span>
                 </div>
-                <div class="col-sm-2 list-col text-ellipsis  hidden-xs ">
+                <div class="col-sm-2 list-col text-ellipsis  hidden-xs {%= data.reference_doctype ? "": "noclick relink-link"%}">
                     <span class="list-value">
                         <a class="filterable h6 text-muted grey noclick reference-document"  data-filter="reference_doctype,=,{%= data.reference_doctype %}" title="Linked Doctype: {%= data.reference_doctype %}" href="#Form/{%= data.reference_doctype %}/{%= data.reference_name %}"data-filter="reference_name,=,{%= data.reference_name %}">{%= data.reference_name %}</a>
-                        <i class="icon-link pull-right noclick relink-link" data-reference_doctype="{%= data.reference_doctype %}" data-reference_name="{%= data.reference_name %}"></i>
+                        <!--<i class="icon-link pull-right noclick " data-reference_doctype="{%= data.reference_doctype %}" data-reference_name="{%= data.reference_name %}"></i>-->
                     </span>
                 </div>
                 <div class="col-sm-1 list-col text-ellipsis  hidden-xs  " title="Sent or Received: {%= data.sent_or_received %}">

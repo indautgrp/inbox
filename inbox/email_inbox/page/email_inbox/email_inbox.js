@@ -142,10 +142,10 @@ frappe.Inbox= Class.extend({
 								return
 							}
 							var name = $(btn.target).closest(".doclist-row").data("name");
-							if (me.data[name]["nomatch"] || me.data[name]["supplier"] || me.data[name]["customer"]) {
-								me.email_open(btn);
+							if (!$(btn.target).hasClass("force-company") && (me.data[name]["nomatch"] || me.data[name]["supplier"] || me.data[name]["customer"])) {
+								me.email_open(name);
 							} else {
-								me.company_select(btn);
+								me.company_select(name);
 							}
 						});
 						$(me.wrapper).find(".relink-link").click(function (btn) {
@@ -193,13 +193,11 @@ frappe.Inbox= Class.extend({
 			}
 		})
 	},
-	company_select:function(btn)
+	company_select:function(name,allownomatch)
 	{
 		var me = this;
-		var name = $(btn.target).closest(".doclist-row").data("name");
-		var d = new frappe.ui.Dialog ({
-			title: __("Match emails to a Company"),
-			fields: [{
+		//var name = $(btn.target).closest(".doclist-row").data("name");
+		var fields = [{
 				"fieldtype": "Heading",
 				"label": __("Create new Contact for a Customer or Supplier to Match"),
 				"fieldname": "Option1"
@@ -219,8 +217,10 @@ frappe.Inbox= Class.extend({
 					"fieldtype": "Button",
 					"label": __("Update Existing Contect"),
 					"fieldname":"updatecontact"
-				},
-				{
+				}
+				];
+		if (allownomatch) {
+			fields.append({
 				"fieldtype": "Heading",
 				"label": __("Do not Match"),
 				"fieldname": "Option3"
@@ -229,7 +229,11 @@ frappe.Inbox= Class.extend({
 					"fieldtype": "Button",
 					"label": __("Do not Match"),
 					"fieldname":"nomatch"
-				}]
+				})
+		}
+		var d = new frappe.ui.Dialog ({
+			title: __("Match emails to a Company"),
+			fields: fields
 		});
 		d.get_input("newcontact").on("click", function (frm) {
 			d.hide();
@@ -253,23 +257,28 @@ frappe.Inbox= Class.extend({
 			};
 			frappe.set_route("List", "Contact");
 		});
-		d.get_input("nomatch").on("click", function (frm) {
-			d.hide();
-			frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.setnomatch',
-                args:{
-                    name:name
-                }
-            });
-			me.data[name]["nomatch"]=1;
-			me.email_open(btn)
-		});
+		if (allownomatch) {
+			d.get_input("nomatch").on("click", function (frm) {
+				d.hide();
+				frappe.call({
+					method: 'inbox.email_inbox.page.email_inbox.setnomatch',
+					args: {
+						name: name
+					}
+				});
+				me.data[name]["nomatch"] = 1;
+
+				if (!allownomatch) {
+					me.email_open(name)
+				}
+			});
+		}
 		d.show();
 
 	},
-	email_open:function(btn)
+	email_open:function(name)
 	{
-		if (Object.keys($(btn.target).data()).length != 0){
+		/*if (Object.keys($(btn.target).data()).length != 0){
 			var cell = $(btn.target).data()["filter"].split(",")[0];
 			if (cell =="reference_doctype"){
 				return
@@ -277,10 +286,10 @@ frappe.Inbox= Class.extend({
 			if (cell =="company"){
 				return
 			}
-		} 
+		} */
 		var me = this;
 		var row ="";
-		var name = $(btn.currentTarget).data("name");
+		//var name = $(btn.currentTarget).data("name");
 		row = me.data[name];
 		//mark email as read
 		this.mark_read(this,name);
@@ -298,16 +307,16 @@ frappe.Inbox= Class.extend({
 
 		var c = me.prepare_email(row);
 		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_display",  {data:c}));
-		//emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_display",  {data:c}))
-		//$(".section-body").html(frappe.render_template("inbox_display",  {data:c}));
 
 		me.add_reply_btn_event(emailitem, c);
 		$(emailitem.fields_dict.email.$wrapper).find(".relink-link").on("click", function () {
 			me.relink(name);
 		});
+		$(emailitem.fields_dict.email.$wrapper).find(".company-link").on("click", function () {
+			me.company_select(name);
+		});
+		
 
-
-		//disabled only for testing bring it back/////////========================================================================================
 		$(".modal-dialog").addClass("modal-lg");
 		$(".modal-header").find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-10");
 		$(".modal-header").find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-2");
