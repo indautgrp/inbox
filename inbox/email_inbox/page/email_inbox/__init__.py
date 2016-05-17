@@ -99,7 +99,7 @@ def get_length(email_account):
 @frappe.whitelist()
 def get_accounts(user):
 	try:
-		return frappe.db.sql("""select email_account
+		return frappe.db.sql("""select email_account,email_id
 		from `tabUser Emails`
 		where parent = %(user)s
 		order by idx""",{"user":user},as_dict=1)

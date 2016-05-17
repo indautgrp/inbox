@@ -45,7 +45,7 @@ frappe.Inbox= Class.extend({
 			this.render_list();
 			this.render_buttons();
 			this.init_select_all();
-			this.make_filters();
+			//this.make_filters(); hidden till fix
 		}else{
 			alert("No Email Account assigned to you contact your System administrator");
 			if (frappe.session.user==="Administrator")
@@ -89,9 +89,7 @@ frappe.Inbox= Class.extend({
 						$(".list-select-all").prop("checked",false);
 						me.render_list();
 						me.update_footer();
-
-
-						//$(me.footer).bootstrapPaginator();
+						
 					});
 	
 					//for mobile sidemenu
@@ -193,11 +191,10 @@ frappe.Inbox= Class.extend({
 			}
 		})
 	},
-	company_select:function(name,allownomatch)
+	company_select:function(name,nomatch)
 	{
 		var me = this;
-		//var name = $(btn.target).closest(".doclist-row").data("name");
-		var fields = [{
+		/*var*/ fields = [{
 				"fieldtype": "Heading",
 				"label": __("Create new Contact for a Customer or Supplier to Match"),
 				"fieldname": "Option1"
@@ -219,13 +216,13 @@ frappe.Inbox= Class.extend({
 					"fieldname":"updatecontact"
 				}
 				];
-		if (allownomatch) {
-			fields.append({
+		if (!nomatch) {
+			fields.push({
 				"fieldtype": "Heading",
 				"label": __("Do not Match"),
 				"fieldname": "Option3"
-				},
-				{
+				})
+			fields.push({
 					"fieldtype": "Button",
 					"label": __("Do not Match"),
 					"fieldname":"nomatch"
@@ -257,7 +254,7 @@ frappe.Inbox= Class.extend({
 			};
 			frappe.set_route("List", "Contact");
 		});
-		if (allownomatch) {
+		if (!nomatch) {
 			d.get_input("nomatch").on("click", function (frm) {
 				d.hide();
 				frappe.call({
@@ -267,8 +264,7 @@ frappe.Inbox= Class.extend({
 					}
 				});
 				me.data[name]["nomatch"] = 1;
-
-				if (!allownomatch) {
+				if (!nomatch) {
 					me.email_open(name)
 				}
 			});
@@ -278,18 +274,8 @@ frappe.Inbox= Class.extend({
 	},
 	email_open:function(name)
 	{
-		/*if (Object.keys($(btn.target).data()).length != 0){
-			var cell = $(btn.target).data()["filter"].split(",")[0];
-			if (cell =="reference_doctype"){
-				return
-			}
-			if (cell =="company"){
-				return
-			}
-		} */
 		var me = this;
 		var row ="";
-		//var name = $(btn.currentTarget).data("name");
 		row = me.data[name];
 		//mark email as read
 		this.mark_read(this,name);
@@ -313,7 +299,7 @@ frappe.Inbox= Class.extend({
 			me.relink(name);
 		});
 		$(emailitem.fields_dict.email.$wrapper).find(".company-link").on("click", function () {
-			me.company_select(name);
+			me.company_select(name,true);
 		});
 		
 
