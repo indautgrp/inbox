@@ -45,6 +45,7 @@ frappe.Inbox= Class.extend({
 			this.render_list();
 			this.render_buttons();
 			this.init_select_all();
+
 			//this.make_filters(); hidden till fix
 		}else{
 			alert("No Email Account assigned to you contact your System administrator");
@@ -74,15 +75,15 @@ frappe.Inbox= Class.extend({
 				var buttons = '<div class="layout-main-section">';
 				if (list["message"]){
 					me.account = list["message"][0]["email_account"];
-					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " style="margin-left: 10px;">'+list["message"][0]["email_account"]+'</span> </div></div>';
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " data-account="'+list["message"][0]["email_account"]+'" style="margin-left: 10px;">'+list["message"][0]["email_id"]+'</span> </div></div>';
 					for (var i = 1;i<list["message"].length;i++)
 					{
-						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" style="margin-left: 10px;">'+list["message"][i]["email_account"]+'</span> </div></div>';
+						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
 					}
 					me.render_footer()
 					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
 					$(".inbox-select").click(function(btn){
-						me.account = $(btn.currentTarget).find(".inbox-item").html();
+						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
 						$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
@@ -97,7 +98,7 @@ frappe.Inbox= Class.extend({
 					$(".sidebar-left").find(".form-sidebar").append(buttons);
 
 					$(".form-sidebar").find(".inbox-select").click(function(btn){
-						me.account = $(btn.currentTarget).find(".inbox-item").html();
+						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
 						$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
@@ -140,7 +141,7 @@ frappe.Inbox= Class.extend({
 								return
 							}
 							var name = $(btn.target).closest(".doclist-row").data("name");
-							if (!$(btn.target).hasClass("force-company") && (me.data[name]["nomatch"] || me.data[name]["supplier"] || me.data[name]["customer"])) {
+							if (!$(btn.target).hasClass("force-company") && (me.data[name]["nomatch"] || me.data[name]["timeline_doctype"])) {
 								me.email_open(name);
 							} else {
 								me.company_select(name);
@@ -693,25 +694,7 @@ var link = me.wrapper.page.add_field({
 		return f;
 	},
 	///unused////////////////////////////
-	notifyUser:function (event) {
-		var title;
-		var options;
-
-		event.preventDefault();
-
-		if (event.target.id === 'button-wn-show-preset') {
-			title = 'Email received';
-			options = {
-				body: 'You have a total of 3 unread emails',
-				tag: 'preset',
-				icon: 'http://www.audero.it/favicon.ico'
-			};
-		} else {
-			title = document.getElementById('title').value;
-			options = {
-				body: document.getElementById('body').value,
-				tag: 'custom'
-			};
-		}
+	notifyUser:function () {
+		frappe.utils.notify("subject","body text here",{},function(){console.log("hi")})
 	}
 });
