@@ -15,9 +15,9 @@
                     </span>
                 </div>
 
-                <div class="col-sm-2 list-col text-ellipsis  hidden-xs {%= data.timeline_doctype? "":"force-company" %}">
+                <div class="col-sm-2 list-col text-ellipsis  hidden-xs {%= data.timeline_label? "":"force-company" %}">
                     <span class="list-value">
-                        <a class="filterable h6 text-muted grey noclick" data-filter="timeline_doctype,=,{%= data.timeline_doctype %}" title="Linked Doctype: {%= data.reference_doctype %}" href="#Form/{%= data.timeline_doctype %}/{%= data.timeline_name %}" data-filter="timeline_name,=,{%= data.timeline_name %}">{%= data.timeline_label?data.timeline_label:data.timeline_name%}</a>
+                        <a class="filterable h6 text-muted grey noclick" data-filter="timeline_doctype,=,{%= data.timeline_doctype %}" title="Linked Doctype: {%= data.reference_doctype %}" href="#Form/{%= data.timeline_doctype %}/{%= data.timeline_name %}" data-filter="timeline_name,=,{%= data.timeline_name %}">{%= data.timeline_label%}</a>
 
                     </span>
                 </div>

@@ -63,7 +63,7 @@ frappe.Inbox= Class.extend({
 				}
 			});
 
-			this.make_filters(); //hidden till fix
+			//this.make_filters(); //hidden till fix
 		}else{
 			alert("No Email Account assigned to you contact your System administrator");
 			if (frappe.session.user==="Administrator")
@@ -94,10 +94,10 @@ frappe.Inbox= Class.extend({
 					me.account = list["message"][0]["email_account"];
 					me.accounts = [];
 					me.accounts[0] = me.account;
-					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item col-md-12 " data-account="'+list["message"][0]["email_account"]+'" style="margin-left: 10px;">'+list["message"][0]["email_id"]+'</span> </div></div>';
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="'+list["message"][0]["email_id"]+'" data-account="'+list["message"][0]["email_account"]+'" style="margin-left: 10px;">'+list["message"][0]["email_id"]+'</span> </div></div>';
 					for (var i = 1;i<list["message"].length;i++)
 					{
-						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item col-md-12" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
+						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
 						me.accounts.push(list["message"][i]["email_account"])
 					}
 					me.render_footer()
