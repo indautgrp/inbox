@@ -50,15 +50,17 @@ frappe.Inbox= Class.extend({
 				for(var i =0;i<me.accounts.length;i++) {
 					if (data.account == me.accounts[i]) {
 						frappe.utils.notify(data.account, "you have "+data.number+" new emails", {}, function () {
-							console.log("hi");
 							window.focus();
 							me.account = data.account;
 							$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 							$('.inbox-item[data-account="' + data.account + '" ]').closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 							me.render_list();
 							me.update_footer();
-						})
-
+						});
+						if(data.account == me.account) {
+							me.render_list();
+							me.update_footer();
+						}
 					}
 				}
 			});
