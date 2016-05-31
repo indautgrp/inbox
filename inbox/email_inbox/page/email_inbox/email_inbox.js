@@ -235,7 +235,7 @@ frappe.Inbox= Class.extend({
 				},
 				{
 					"fieldtype": "Button",
-					"label": __("Update Existing Contect"),
+					"label": __("Update Existing Contact"),
 					"fieldname":"updatecontact"
 				}
 				];
