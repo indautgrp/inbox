@@ -242,7 +242,7 @@ frappe.Inbox= Class.extend({
 		if (!nomatch) {
 			fields.push({
 				"fieldtype": "Heading",
-				"label": __("Do not Match"),
+				"label": __("Do not Match yet"),
 				"fieldname": "Option3"
 				})
 			fields.push({
