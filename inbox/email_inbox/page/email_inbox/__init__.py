@@ -86,7 +86,7 @@ def setnomatch(name):
 def update_local_flags(names,field,val):
 	names = eval(names)
 	for name in names:
-		frappe.db.set_value("Communication", name, field, val,update_modified=False)
+		frappe.db.set_value("Communication", str(name), field, val,update_modified=False)
 
 @frappe.whitelist()
 def get_length(email_account):
