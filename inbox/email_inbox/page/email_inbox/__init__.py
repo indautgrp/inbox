@@ -74,7 +74,7 @@ def create_flag_queue(names,action,flag,field):
 					"action":action,
 					"flag":flag
 				})
-				flag_queue.save();
+				flag_queue.save(ignore_permissions=True);
 			except Found:
 				pass
 
