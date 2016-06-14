@@ -636,7 +636,7 @@ var link = me.wrapper.page.add_field({
 	delete_email:function(me){
 		//could add flag to sync deletes but not going to
 		var names = me.action_checked_items('.data("name")')
-		me.action_checked_items('.parent().hide()')
+		me.action_checked_items('.parent()[0].remove()')
 		me.update_local_flags(names,"deleted","1")
 	},
 	mark_unread:function(me){
@@ -677,6 +677,7 @@ var link = me.wrapper.page.add_field({
 					val:val
                 }
             })
+            $('.list-delete:checked').prop( "checked", false );
 	},
 	get_checked_items: function() {
 		return $.map(this.wrapper.page.main.find('.list-delete:checked'), function(e) {

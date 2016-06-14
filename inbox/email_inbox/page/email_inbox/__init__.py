@@ -70,7 +70,7 @@ def create_flag_queue(names,action,flag,field):
 
 				flag_queue = frappe.get_doc({
 					"doctype": "Email Flag Queue",
-					"comm_name": name,
+					"comm_name": str(name),
 					"action":action,
 					"flag":flag
 				})
@@ -80,13 +80,13 @@ def create_flag_queue(names,action,flag,field):
 
 @frappe.whitelist()
 def setnomatch(name):
-	frappe.db.set_value("Communication", name, "nomatch", 1, update_modified=False)
+	frappe.db.set_value("Communication", str(name), "nomatch", 1, update_modified=False)
 
 @frappe.whitelist()
 def update_local_flags(names,field,val):
 	names = eval(names)
 	for name in names:
-		frappe.db.set_value("Communication", name, field, val,update_modified=False)
+		frappe.db.set_value("Communication", str(name), field, val,update_modified=False)
 
 @frappe.whitelist()
 def get_length(email_account):
