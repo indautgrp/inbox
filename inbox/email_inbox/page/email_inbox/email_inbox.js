@@ -661,7 +661,7 @@ var link = me.wrapper.page.add_field({
 		frappe.call({
                 method: 'inbox.email_inbox.page.email_inbox.create_flag_queue',
                 args:{
-                    names:names,
+                    names:JSON.stringify(names),
 					action:action,
 					flag:flag,
 					field:field
@@ -672,7 +672,7 @@ var link = me.wrapper.page.add_field({
 			frappe.call({
                 method: 'inbox.email_inbox.page.email_inbox.update_local_flags',
                 args:{
-                    names:names,
+                    names:JSON.stringify(names),
 					field:field,
 					val:val
                 }
