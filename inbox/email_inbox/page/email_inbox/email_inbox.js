@@ -163,16 +163,16 @@ frappe.Inbox= Class.extend({
 								return
 							}
 							var name = $(btn.target).closest(".doclist-row").data("name");
+							if($(btn.target).hasClass("relink-link")){
+								me.relink(name);
+								return
+							}
 							if (!$(btn.target).hasClass("force-company") && (me.data[name]["nomatch"] || me.data[name]["timeline_doctype"])) {
 								me.email_open(name);
 							} else {
 								me.company_select(name);
 							}
 						});
-						$(me.wrapper).find(".relink-link").click(function (btn) {
-							var name = $(btn.target).closest(".doclist-row").data("name");
-							me.relink(name);
-						})
 					}else {
 						$(me.wrapper).find(".result-list").html("<div class='centered'>No Emails to Display</div>");
 					}
@@ -359,10 +359,9 @@ frappe.Inbox= Class.extend({
 				"label": __("Reference Doctype"),
 				"fieldname": "reference_doctype",
 				"reqd": 1,
-				"get_query": function () {
-					return
-					{
-						query: lib + ".get_communication_doctype"
+				"get_query": function() {
+				return {
+						"query": lib +".get_communication_doctype"
 					}
 				}
 			},
