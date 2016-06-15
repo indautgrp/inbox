@@ -53,7 +53,7 @@ def get_email_content(name):
 
 @frappe.whitelist()
 def create_flag_queue(names,action,flag,field):
-	names = eval(names)
+	names = json.loads(names)
 	class Found(Exception):
 		pass
 	for name in names:
@@ -84,7 +84,7 @@ def setnomatch(name):
 
 @frappe.whitelist()
 def update_local_flags(names,field,val):
-	names = eval(names)
+	names = json.loads(names)
 	for name in names:
 		frappe.db.set_value("Communication", str(name), field, val,update_modified=False)
 
