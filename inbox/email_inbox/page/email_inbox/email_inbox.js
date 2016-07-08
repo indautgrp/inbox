@@ -21,6 +21,9 @@ frappe.pages['Email Inbox'].on_page_load = function(wrapper) {
 
 frappe.breadcrumbs.add("Setup");
 
+frappe.pages['Email Inbox'].refresh = function(wrapper) {
+	wrapper.Inbox.refresh()
+}
 
 frappe.Inbox= Class.extend({
     init: function (wrapper) {
@@ -54,12 +57,10 @@ frappe.Inbox= Class.extend({
 							me.account = data.account;
 							$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 							$('.inbox-item[data-account="' + data.account + '" ]').closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-							me.render_list();
-							me.update_footer();
+							me.refresh();
 						});
 						if(data.account == me.account) {
-							me.render_list();
-							me.update_footer();
+							me.refresh();
 						}
 					}
 				}
@@ -78,6 +79,10 @@ frappe.Inbox= Class.extend({
 			}
 		}
     },
+	refresh:function(){
+		this.render_list();
+		this.update_footer();
+	},
 	render_headers: function(){
         //$(cur_frm.fields_dict['inbox_list'].wrapper)
 		$(".layout-main-section-wrapper").css("padding-left","0px").css("padding-right","0px")
@@ -110,9 +115,7 @@ frappe.Inbox= Class.extend({
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
 						$(".list-select-all").prop("checked",false);
-						me.render_list();
-						me.update_footer();
-						
+						me.refresh();
 					});
 	
 					//for mobile sidemenu
@@ -125,8 +128,7 @@ frappe.Inbox= Class.extend({
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
 						$(".list-select-all").prop("checked",false);
-							me.render_list();
-							me.update_footer()
+							me.refresh();
 					});
 							//'<ul class="list-unstyled sidebar-menu standard-actions"><li><a>No rest</a></li></ul>'
 					me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
@@ -266,7 +268,6 @@ frappe.Inbox= Class.extend({
 						"last_name":name_split[name_split.length-1],
 						"status": "Passive"
 					};
-					frappe.route_titles["create user account"]=1
 					frappe.set_route("Form", "Contact", doc.name);
 		});
 		d.get_input("updatecontact").on("click", function (frm) {
@@ -275,6 +276,7 @@ frappe.Inbox= Class.extend({
 			frappe.route_titles["update_contact"] = {
 						"email_id": me.data[name]["sender"]
 			};
+			frappe.route_titles["create_contact"] = 1;
 			frappe.set_route("List", "Contact");
 		});
 		if (!nomatch) {
@@ -415,13 +417,15 @@ frappe.Inbox= Class.extend({
 		var me = this
 		frappe.model.with_doctype('Communication', function() {
 		$(".frappe-list").append(frappe.render_template("inbox_filter"))
-		this.filter_fields = ["Customer"]
+		this.filter_fields = ["Customer","creation"]
 		//this.filter_fields = []
-		this.filter_list = new frappe.ui.FilterList({
+
+
+		me.filter_list = new frappe.ui.FilterList({
 			listobj: me,
 			$parent: $(".frappe-list").find('.list-filters').toggle(true),//this.$w.find('.list-filters').toggle(true),
 			doctype: "Communication",
-			filter_fields: this.filter_fields
+			filter_fields: me.filter_fields
 		});
 		//if(frappe.model.is_submittable(this.doctype)) {
 		//	this.filter_list.add_filter("Page", "ID", "=", "Email Inbox");
@@ -437,14 +441,17 @@ frappe.Inbox= Class.extend({
 
 		//if(!me.opts.no_loading)
 		//	me.set_working(true);
-
+		/*
 		frappe.call({
-			method: 'frappe.desk.query_builder.runquery',
+			method: 'inbox.email_inbox.page.email_inbox.get_list' || 'frappe.desk.query_builder.runquery',
 			type: "GET",
 			//freeze: (this.opts.freeze != undefined ? this.opts.freeze : true),
 			args: {
-				limit_start: this.start,
-				limit_page_length: this.page_length
+				email_account:me.account,
+					start:(me.cur_page-1)*me.page_length,
+					page_length:me.page_length
+				//limit_start: me.start,
+				//limit_page_length: me.page_length
 			},
 			callback: function(r) {
 				if(!me.opts.no_loading)
@@ -454,6 +461,7 @@ frappe.Inbox= Class.extend({
 			},
 			//no_spinner: this.opts.no_loading
 		});
+		*/
 	},
 	prepare_email:function(c){
 		var me = this;
@@ -658,25 +666,25 @@ var link = me.wrapper.page.add_field({
 	},
 	create_flag_queue:function(names,action,flag,field){
 		frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.create_flag_queue',
-                args:{
-                    names:JSON.stringify(names),
-					action:action,
-					flag:flag,
-					field:field
-                }
-            })
+			method: 'inbox.email_inbox.page.email_inbox.create_flag_queue',
+			args:{
+				names:JSON.stringify(names),
+				action:action,
+				flag:flag,
+				field:field
+			}
+		})
 	},
 	update_local_flags:function(names,field,val){
-			frappe.call({
-                method: 'inbox.email_inbox.page.email_inbox.update_local_flags',
-                args:{
-                    names:JSON.stringify(names),
-					field:field,
-					val:val
-                }
-            })
-            $('.list-delete:checked').prop( "checked", false );
+		frappe.call({
+			method: 'inbox.email_inbox.page.email_inbox.update_local_flags',
+			args:{
+				names:JSON.stringify(names),
+				field:field,
+				val:val
+			}
+		})
+		$('.list-delete:checked').prop( "checked", false );
 	},
 	get_checked_items: function() {
 		return $.map(this.wrapper.page.main.find('.list-delete:checked'), function(e) {
