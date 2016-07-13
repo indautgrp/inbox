@@ -152,6 +152,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			doctype: this.doctype,
 			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment"],
 			filters: this.filter_list.get_filters(),
+			order_by: 'actualdate desc'
 		}
 
 		// apply default filters, if specified for a listing
@@ -422,7 +423,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	},
 	run:function(more,footer) {
 		var me = this;
-		console.log(footer)
 		me.start = (me.cur_page-1)*me.page_length
 		if (!footer) {
 			this.update_footer()
