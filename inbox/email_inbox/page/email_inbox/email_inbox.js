@@ -112,7 +112,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						me.accounts.push(list["message"][i]["email_account"])
 					}
 					me.allaccounts = me.accounts.join(", ");
-					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="Combined Inbox" data-account="'+me.allaccounts+'" style="margin-left: 10px;">Combined Inbox</span> </div></div>';
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</span> </div></div>';
 					buttons += rows;
 					me.account = me.allaccounts;
 					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
