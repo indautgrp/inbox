@@ -95,7 +95,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		this.list_header = $(frappe.render_template("inbox_headers", data)).appendTo(this.page.main.find(".list-headers"));
     },
 	render_sidemenu: function () {
-		var me = this
+		var me = this;
         frappe.call({
 			method: 'inbox.email_inbox.page.email_inbox.get_accounts',
 			args:{user:frappe.user["name"]},
@@ -103,16 +103,19 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			callback:function(list){
 				var buttons = '<div class="layout-main-section">';
 				if (list["message"]){
-					me.account = list["message"][0]["email_account"];
-					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "=", me.account]]
 					me.accounts = [];
-					me.accounts[0] = me.account;
-					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="'+list["message"][0]["email_id"]+'" data-account="'+list["message"][0]["email_account"]+'" style="margin-left: 10px;">'+list["message"][0]["email_id"]+'</span> </div></div>';
-					for (var i = 1;i<list["message"].length;i++)
+					var rows = "";
+
+					for (var i = 0;i<list["message"].length;i++)
 					{
-						buttons += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
+						rows += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
 						me.accounts.push(list["message"][i]["email_account"])
 					}
+					me.allaccounts = me.accounts.join(", ");
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</span> </div></div>';
+					buttons += rows;
+					me.account = me.allaccounts;
+					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 					me.render_footer()
 					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
 					$(".inbox-select").click(function(btn){
@@ -121,7 +124,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
 						$(".list-select-all").prop("checked",false);
-						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "=", me.account]]
+						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
 						me.filter_list.reload_stats();
 						me.refresh();
@@ -137,7 +140,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
 						$(".list-select-all").prop("checked",false);
-						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "=", me.account]]
+						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
 						me.filter_list.reload_stats();
 						me.refresh();
@@ -157,7 +160,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 
 		// apply default filters, if specified for a listing
 		args.filters.push(["Communication", "communication_type", "=", "Communication"]);
-		args.filters.push(["Communication","email_account","=",this.account])
+		args.filters.push(["Communication","email_account","in",this.account])
+		args.filters.push(["Communication", "deleted", "=", 0])
 
 		return args;
 	},
@@ -488,8 +492,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
         var me = this;
 
 		$(".list-select-all").on("click", function () {
-			//$(me.wrapper.page).find('.list-delete').prop("checked", $(this).prop("checked"));
-			$(".list-delete").prop("checked", $(".list-select-all").prop("checked"));
+			$(me.wrapper).find('.list-delete').prop("checked", $(this).prop("checked"));
 			me.toggle_actions();
 		});
 
@@ -587,7 +590,7 @@ var link = me.wrapper.page.add_field({
         }
     },
 	delete_email:function(me){
-		//could add flag to sync deletes but not going to
+		//could add flag to sync deletes but not going to as keeps history
 		var names = me.action_checked_items('.data("name")')
 		me.action_checked_items('.parent()[0].remove()')
 		me.update_local_flags(names,"deleted","1")
