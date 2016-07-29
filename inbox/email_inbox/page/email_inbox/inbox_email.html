@@ -1,4 +1,4 @@
-<div class="pull-left media-body" style="max-width: calc(100% - 50px); padding-right: 0px;min-height: 200px;">
+<div class="pull-left media-body" style="max-width: 100%; padding-right: 0px;min-height: 200px;">
     <div class="media-content-wrapper">
         <!--{% if(data.doctype=="Communication" || data.comment_type=="Comment") { %}-->
             <div class="comment-header small" >
@@ -34,14 +34,6 @@
                     {% if (frappe.model.can_read(\'Communication\')) { %}
                     </a>
                     {% } %}
-                    <a class="text-muted company-link pull-right"
-                        data-name="{%= data.name %}"> &ndash; {%= __("Match") %}</a>
-
-                    <a class="text-muted relink-link pull-right"
-                        data-name="{%= data.name %}"> {%= __("Relink") %}</a>
-
-                    <!--<a class="text-muted reply-link pull-right"
-                        data-name="{%= data.name %}">{%= __("Reply") &ndash;  %}</a>-->
                 {% } %}
                 <!--liked
                 <span class="comment-likes" data-liked-by=\'{{ JSON.stringify(data._liked_by) }}\'>
@@ -76,35 +68,5 @@
                 {%= data.comment_html %}
             </div>
         </div>
-        <!--something other than communication
-        {% } else if(in_list(["Assignment Completed", "Assigned", "Shared", "Unshared"], data.comment_type)) { %}
-            <div class="small">
-                <i class="{%= data.icon %} icon-fixed-width"></i>
-                    {% if(data.reference_doctype && data.reference_name) { %}
-                    <a href="#Form/{%= data.reference_doctype %}/{%= data.reference_name %}">
-                    {% } %}
-                        {%= data.comment %}
-                    {% if(data.reference_doctype && data.reference_name) { %}
-                    </a>
-                    {% } %}
-                    <span class="text-muted" style="font-weight: normal;">
-                    &ndash; {%= data.comment_on %}</span>
-            </div>
-        {% } else { %}
-            <div class="small">
-                <i class="{%= data.icon %} icon-fixed-width"></i>
-                {% if (data.comment_type == "Like") { %}
-                    <span title="{%= data.comment_by %}">{%= __("Liked by {0}", [data.fullname]) %}</span>
-                {% } else { %}
-                    <span title="{%= data.comment_by %}">{%= data.fullname %}</span>
-                    {%= data.comment %}
-                {% } %}
-                <span class="text-muted" style="font-weight: normal;">
-                &ndash; {%= data.comment_on %}</span>
-            </div>
-        {% } %}
-        -->
-
-
     </div>
 </div>
