@@ -59,7 +59,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			var me = this;
 			frappe.realtime.on("new_email", function(data) {
 				for(var i =0;i<me.accounts.length;i++) {
-					if (data.account == me.accounts[i]) {
+					if (data.account == me.accounts[i].name) {
 						frappe.utils.notify(data.account, "you have "+data.number+" new emails", {}, function () {
 							window.focus();
 							me.account = data.account;
@@ -109,21 +109,22 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					for (var i = 0;i<list["message"].length;i++)
 					{
 						rows += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
-						me.accounts.push(list["message"][i]["email_account"])
+						me.accounts.push({name:list["message"][i]["email_account"],email:list["message"][i]["email_id"]})
 					}
-					me.allaccounts = me.accounts.join(", ");
+					me.allaccounts = $.map(me.accounts,function(v){return v.name}).join(",")
 					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</span> </div></div>';
 					buttons += rows;
 					me.account = me.allaccounts;
 					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
-					me.render_footer()
+
 					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
 					$(".inbox-select").click(function(btn){
 						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
 						$(me.wrapper.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
-						$(".list-select-all").prop("checked",false);
+						$(me.wrapper.page.main).find(".list-select-all,.list-delete").prop("checked",false);
+						me.toggle_actions();
 						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
 						me.filter_list.reload_stats();
@@ -139,7 +140,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 						me.cur_page = 1;
-						$(".list-select-all").prop("checked",false);
+						$(me.wrapper.page.main).find(".list-select-all,.list-delete").prop("checked",false);
+						me.toggle_actions();
 						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
 						me.filter_list.reload_stats();
@@ -153,7 +155,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	get_args: function(){
 		var args = {
 			doctype: this.doctype,
-			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment"],
+			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment"],
 			filters: this.filter_list.get_filters(),
 			order_by: 'actualdate desc'
 		}
@@ -330,36 +332,92 @@ frappe.Inbox = frappe.ui.Listing.extend({
                 }]
             });
 		var c = me.prepare_email(row);
-		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_display",  {data:c}));
+		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_email",  {data:c}));
 
-		me.add_reply_btn_event(emailitem, c);
-		$(emailitem.fields_dict.email.$wrapper).find(".relink-link").on("click", function () {
+		$(emailitem.$wrapper).find(".text-right").prepend(frappe.render_template("inbox_email_actions"));
+
+
+		$(emailitem.$wrapper).find(".relink-link").on("click", function () {
 			me.relink(name);
 		});
-		$(emailitem.fields_dict.email.$wrapper).find(".company-link").on("click", function () {
+		$(emailitem.$wrapper).find(".company-link").on("click", function () {
 			me.company_select(name,true);
 		});
+		me.add_reply_btn_event(emailitem, c);
+
 
 		$(".modal-dialog").addClass("modal-lg");
-		$(".modal-header").find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-10");
-		$(".modal-header").find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-2");
+		$(emailitem.$wrapper).find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-7 col-sm-8 col-md-9");
+		$(emailitem.$wrapper).find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-5 col-sm-4 col-md-3");
 		emailitem.show();
 	},
 	add_reply_btn_event: function (emailitem, c) {
         var me = this;
-        $(emailitem.fields_dict.email.$wrapper).find(".reply-link").on("click", function () {
+//reply
+        $(emailitem.$wrapper).find(".reply-link").on("click", function () {
             var name = $(this).attr("data-name");
-            var last_email = c;
-
-            // make the composer
-            new frappe.views.CommunicationComposer({
-                //doc: false,//me.frm.doc,
-                txt: "",
-                frm: false,//me.frm,
-				subject: "Re: "+ c.subject,
+            var sender = ""
+			for (var i=0;i<me.accounts.length;i++){
+				if(me.accounts[i].name===me.account){
+					var sender =  me.accounts[i].email
+					break;
+				}
+			}
+			new frappe.views.CommunicationComposer({
+				doc: {
+					doctype: c.reference_doctype,
+					name: c.reference_name
+				},
+				txt: "",
+				sender:sender,
+				subject: "Re: " + c.subject,
 				recipients: c.sender,
-                last_email: last_email
-            });
+				last_email: c
+			});
+        });
+//reply-all
+		$(emailitem.$wrapper).find(".reply-all-link").on("click", function () {
+            var name = $(this).attr("data-name");
+            var sender = ""
+			for (var i=0;i<me.accounts.length;i++){
+				if(me.accounts[i].name===me.account){
+					var sender =  me.accounts[i].email
+					break;
+				}
+			}
+			new frappe.views.CommunicationComposer({
+				doc: {
+					doctype: c.reference_doctype,
+					name: c.reference_name
+				},
+				txt: "",
+				sender:sender,
+				subject: "Re: " + c.subject,
+				recipients: c.sender+ (c.cc ? ","+c.cc:""),
+				last_email: c
+			});
+        });
+//forward
+		$(emailitem.$wrapper).find(".forward-link").on("click", function () {
+            var name = $(this).attr("data-name");
+            var sender = ""
+			for (var i=0;i<me.accounts.length;i++){
+				if(me.accounts[i].name===me.account){
+					var sender =  me.accounts[i].email
+					break;
+				}
+			}
+			new frappe.views.CommunicationComposer({
+				doc: {
+					doctype: c.reference_doctype,
+					name: c.reference_name
+				},
+				txt: "",
+				sender:sender,
+				subject: "FW: " + c.subject,
+				last_email: c,
+				forward:true
+			});
         });
     },
 	relink:function(name){
@@ -512,9 +570,10 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		});
 
 		// after delete, hide delete button
-
+		me.toggle_actions();
 		$(me.wrapper).on("render-complete", function () {
-			me.toggle_actions();
+
+
 		});
 
     },
@@ -527,12 +586,24 @@ frappe.Inbox = frappe.ui.Listing.extend({
 
 		/*
 		me.wrapper.page.add_menu_item("menu item1",function(){console.log("hi")},true)
-
-
-
 		me.wrapper.page.add_action_icon("icon-download",function(){console.log("hi")})
+		*/
+		me.wrapper.page.set_primary_action("New Email",function(){
+			var sender = ""
+			for (var i=0;i<me.accounts.length;i++){
+				if(me.accounts[i].name===me.account){
+					var sender =  me.accounts[i].email
+					break;
+				}
+			}
+			new frappe.views.CommunicationComposer({
+					doc: {},
+					sender: sender,
+					txt: "",
+			});
+		},"icon-plus","New Email")
 
-		me.wrapper.page.set_primary_action("primary action",function(){console.log("primary action")},"icon-inbox","working label")
+		/*
 		me.wrapper.page.set_secondary_action("secondary action",function(){console.log("secondary action")},"icon-inbox","working label")
 
 
@@ -578,22 +649,26 @@ var link = me.wrapper.page.add_field({
 */
 		
 	},
-
     toggle_actions: function () {
         var me = this;
         if (me.wrapper.page.main.find(".list-delete:checked").length) {
             //show buttons
 			$(me.wrapper.page.actions_btn_group).show()
+			$(me.wrapper.page.btn_primary).hide()
+
         } else {
             //hide button
 			$(me.wrapper.page.actions_btn_group).hide()
+			$(me.wrapper.page.btn_primary).show()
         }
     },
 	delete_email:function(me){
 		//could add flag to sync deletes but not going to as keeps history
 		var names = me.action_checked_items('.data("name")')
+		console.log(me.data.length)
 		me.action_checked_items('.parent()[0].remove()')
 		me.update_local_flags(names,"deleted","1")
+
 	},
 	mark_unread:function(me){
 		var names = me.action_checked_items('.data("name")')
