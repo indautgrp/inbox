@@ -155,7 +155,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	get_args: function(){
 		var args = {
 			doctype: this.doctype,
-			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment"],
+			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment",timeline_hide],
 			filters: this.filter_list.get_filters(),
 			order_by: 'actualdate desc'
 		}
@@ -468,7 +468,11 @@ frappe.Inbox = frappe.ui.Listing.extend({
 								$(me.wrapper).find(".row-named[data-name="+row.name+"]").find(".reference-document")
 									.html(values["reference_name"])
 								.attr("href",'#Form/'+values["reference_doctype"]+ '/'+values["reference_name"])
-								.attr("title","Linked Doctype: "+values["reference_doctype"]);
+								.attr("title","Linked Doctype: "+values["reference_doctype"])
+								row.reference_doctype = values["reference_doctype"]
+								row.reference_name = values["reference_name"]
+								
+								
 								return false;
 							}
 						})
