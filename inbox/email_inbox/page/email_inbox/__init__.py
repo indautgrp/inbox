@@ -18,7 +18,6 @@ def get_list(email_account,start,page_length):
 				ORDER BY actualdate DESC
 				LIMIT %(page_length)s OFFSET %(start)s""",{"email_account":email_account,"start":int(start),"page_length":int(page_length)},as_dict=1)
 	for c in communications:
-		#comm = inbox_list.append( {})
 		comm = {}
 
 		comm["name"] = c.get('name')
@@ -42,7 +41,6 @@ def get_list(email_account,start,page_length):
 		comm["nomatch"] =c.get('nomatch')
 		comm["has_attachment"]=c.get('has_attachment')
 		inbox_list.append(comm)
-		#inbox_list[comm["name"]] = comm
 	return inbox_list
 
 @frappe.whitelist()
@@ -56,27 +54,29 @@ def create_flag_queue(names,action,flag,field):
 	names = json.loads(names)
 	class Found(Exception):
 		pass
-	for name in names:
-		state = frappe.db.get_value("Communication", name, field)
-		if (action =='+FLAGS' and state ==0) or (action =='-FLAGS' and state ==1):
-			try:
-				queue = frappe.db.sql("""select name,action,flag from `tabEmail Flag Queue`
-				where comm_name = %(name)s""",{"name":name},as_dict=1)
-				for item in queue:
-					if item.flag==flag:#is same email with same flag
-						if item.action!=action:#to prevent flag local and server states being out of sync
-							frappe.delete_doc("Email Flag Queue", item.name)
-						raise Found
 
-				flag_queue = frappe.get_doc({
-					"doctype": "Email Flag Queue",
-					"comm_name": str(name),
-					"action":action,
-					"flag":flag
-				})
-				flag_queue.save(ignore_permissions=True);
-			except Found:
-				pass
+	for item in names:
+		if item["u"]:
+			state = frappe.db.get_value("Communication", item["n"], field)
+			if (action =='+FLAGS' and state ==0) or (action =='-FLAGS' and state ==1): #check states are correct
+				try:
+					queue = frappe.db.sql("""select name,action,flag from `tabEmail Flag Queue`
+					where comm_name = %(name)s""",{"name":item["n"]},as_dict=1)
+					for item in queue:
+						if item.flag==flag:#is same email with same flag
+							if item.action!=action:#to prevent flag local and server states being out of sync
+								frappe.delete_doc("Email Flag Queue", item["n"])
+							raise Found
+	
+					flag_queue = frappe.get_doc({
+						"doctype": "Email Flag Queue",
+						"comm_name": str(item["n"]),
+						"action":action,
+						"flag":flag
+					})
+					flag_queue.save(ignore_permissions=True);
+				except Found:
+					pass
 
 @frappe.whitelist()
 def setnomatch(name):
@@ -85,8 +85,8 @@ def setnomatch(name):
 @frappe.whitelist()
 def update_local_flags(names,field,val):
 	names = json.loads(names)
-	for name in names:
-		frappe.db.set_value("Communication", str(name), field, val,update_modified=False)
+	for d in names:
+		frappe.db.set_value("Communication", str(d["n"]), field, val,update_modified=False)
 
 @frappe.whitelist()
 def get_length(email_account):

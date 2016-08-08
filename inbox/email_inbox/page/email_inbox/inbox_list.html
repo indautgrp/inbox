@@ -1,5 +1,5 @@
-<div class="list-row">
-    <div class="row doclist-row  has-checkbox row-named" data-name="{%= data.name %}" data-hascompany="{%= (data.customer || data.supplier)?true:false%}"style=" {%= data.seen ? "font-weight:normal" : "font-weight:bold" %}">
+<div class="list-row row-named" data-name="{%= data.name %}" style=" {%= data.seen ? "font-weight:normal" : "font-weight:bold" %}">
+    <div class="row doclist-row  has-checkbox">
         <div class="col-mg-5  col-sm-12  list-row-left">
             <div class="row">
                 <div class="col-sm-2 list-col text-ellipsis  col-xs-12">
@@ -15,7 +15,7 @@
                     </span>
                 </div>
 
-                <div class="col-sm-2 list-col text-ellipsis  hidden-xs {%= data.timeline_label? "":"force-company" %}">
+                <div class="col-sm-2 list-col text-ellipsis  hidden-xs">
                     <span class="list-value">
                         <a class="filterable h6 text-muted grey noclick" data-filter="timeline_doctype,=,{%= data.timeline_doctype %}" title="Linked Doctype: {%= data.reference_doctype %}" href="#Form/{%= data.timeline_doctype %}/{%= data.timeline_name %}" data-filter="timeline_name,=,{%= data.timeline_name %}">{%= data.timeline_label%}</a>
 
