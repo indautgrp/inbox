@@ -169,9 +169,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	},
 	render_list:function(data){
 		var me = this
-		for (var i = 0; i < data.length; i++) {
-							me.data[data[i].name] = data[i]
-		}
 		$(me.wrapper).find(".result-list").html("");
 			for (var i = 0; i < data.length; i++)
 			{
