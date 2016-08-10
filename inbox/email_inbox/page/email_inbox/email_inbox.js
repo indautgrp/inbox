@@ -155,7 +155,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	get_args: function(){
 		var args = {
 			doctype: this.doctype,
-			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment",timeline_hide],
+			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment","timeline_hide"],
 			filters: this.filter_list.get_filters(),
 			order_by: 'actualdate desc'
 		}
@@ -198,7 +198,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	},
 	render_footer:function(){
 		var me = this;
-		me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-6"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
+		me.footer = $(me.wrapper).append(' <footer class="footer hidden-xs" style="position: fixed;bottom: 0;width: 100%;height: 60px;background-color: #f5f5f5;"><div class="container" > <div class="col-sm-7"><ul class="foot-con"></ul><div class="footer-numbers" style="vertical-align: middle;float:right;margin: 20px 0"></div></div> </footer>').find(".foot-con");
 		me.footer.bootstrapPaginator({
 			currentPage: 1,
 			totalPages: 10,
@@ -534,6 +534,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
             } else {
                 c.comment_html = c.comment;
                 c.comment_html = frappe.utils.strip_whitespace(c.comment_html);
+				c.comment_html = c.comment_html.replace(/&lt;/g,"<").replace(/&gt;/g,">")
             }
 
 
