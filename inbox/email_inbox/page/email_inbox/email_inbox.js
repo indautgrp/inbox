@@ -185,7 +185,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					me.relink(row);
 					return
 				}
-				if (!row.timeline_label && (row.nomatch || row.timeline_doctype)) {
+				if (row.timeline_label || row.nomatch) {
 					me.email_open(row);
 				} else {
 					me.company_select(row);
