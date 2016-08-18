@@ -67,11 +67,13 @@ frappe.Inbox = frappe.ui.Listing.extend({
 							$('.inbox-item[data-account="' + data.account + '" ]').closest(".list-row").addClass("list-row-head").css("font-weight","bold");
 							me.refresh();
 						});
-						if(data.account == me.account) {
+						if(!me.fresh &&(data.account == me.account ||me.account == me.allaccounts)) {
+							me.fresh = true
 							me.refresh();
 						}
 					}
 				}
+				me.fresh = false
 			});
 		}else{
 			alert("No Email Account assigned to you contact your System administrator");
