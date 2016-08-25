@@ -324,7 +324,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	{
 		var me = this;
 		//mark email as read
-		this.mark_read(this,[row.name,row.uid]);
+		this.mark_read(this,{n:row.name,u:row.uid});
 		//start of open email
 
 		var emailitem = new frappe.ui.Dialog ({
@@ -684,13 +684,13 @@ var link = me.wrapper.page.add_field({
 		me.update_local_flags(names,"seen","0")
 	},
 	mark_read:function(me,data){
-		if (!name) {
+		if (!data) {
 			var rows = me.action_checked_items('.data("data")')
 			var names = $.map(rows,function(v){return {n:v.name,u:v.uid}})
 			me.action_checked_items('.css("font-weight", "normal")')
 		} else{
 			var names = [data]
-			$(".row-named").filter("[data-name="+name+"]").css("font-weight", "normal")
+			$(".row-named").filter("[data-name="+data.n+"]").css("font-weight", "normal")
 		}
 		me.create_flag_queue(names,"+FLAGS","(\\SEEN)","seen")
 		me.update_local_flags(names,"seen","1")
