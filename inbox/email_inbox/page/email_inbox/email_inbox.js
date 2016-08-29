@@ -19,7 +19,7 @@ frappe.pages['Email Inbox'].on_page_load = function(wrapper) {
 	});
 }
 
-frappe.breadcrumbs.add("Setup");
+//frappe.breadcrumbs.add("Setup");
 
 frappe.pages['Email Inbox'].refresh = function(wrapper) {
 	if (wrapper.inbox) {
@@ -246,17 +246,18 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		var me = this;
 		var fields = [{
 				"fieldtype": "Heading",
-				"label": __("Create new Contact for a Customer or Supplier to Match"),
+				"label": __("Create new Contact to Match Email Address"),
 				"fieldname": "Option1"
 				},
 				{
 					"fieldtype": "Button",
 					"label": __("Create new Contact"),
-					"fieldname":"newcontact"
+					"fieldname":"newcontact",
+					"description": __("Create new Contact for a Customer, Supplier, User or Organisation to Match")
 				},
 				{
 				"fieldtype": "Heading",
-				"label": __("Replace Email on Contact"),
+				"label": __("Replace Email Address on Contact"),
 				"fieldname": "Option2"
 				},
 				{
@@ -278,13 +279,13 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				})
 		}
 		var d = new frappe.ui.Dialog ({
-			title: __("Match emails to a Company"),
+			title: __("Match Emails to a Company"),
 			fields: fields
 		});
 		d.get_input("newcontact").on("click", function (frm) {
 			d.hide();
 			frappe.route_titles["create_contact"] = 1;
-			var name_split = row.sender_full_name.split(' ');
+			var name_split = row.sender_full_name?row.sender_full_name.split(' '):["",""];
 			var doc = frappe.model.get_new_doc("Contact");
 					frappe.route_options = {
 						"email_id": row.sender,
@@ -689,8 +690,8 @@ var link = me.wrapper.page.add_field({
 			var names = $.map(rows,function(v){return {n:v.name,u:v.uid}})
 			me.action_checked_items('.css("font-weight", "normal")')
 		} else{
-			var names = [data]
-			$(".row-named").filter("[data-name="+data.n+"]").css("font-weight", "normal")
+				var names = [data]
+				$(".row-named").filter("[data-name=" + data.n + "]").css("font-weight", "normal")
 		}
 		me.create_flag_queue(names,"+FLAGS","(\\SEEN)","seen")
 		me.update_local_flags(names,"seen","1")
