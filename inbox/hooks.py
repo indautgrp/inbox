@@ -17,9 +17,9 @@ fixtures = ["Custom Field","Custom Script"]
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/inbox/css/inbox.css"
-#app_include_js = [
-#"assets/js/desk2.min.js",
-#]
+app_include_js = [
+"assets/js/desk2.min.js",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/inbox/css/inbox.css"
@@ -77,6 +77,12 @@ doc_events = {
 	},
 	"Communication":{
 		"after_insert":"inbox.email_inbox.contact.match_email_to_contact"
+	},
+	"User":{
+		"validate":"inbox.email_inbox.user.user_validate"
+	},
+	"Email Account":{
+		"validate":"inbox.email_inbox.user.push_email_to_user_emails"
 	}
 	
 }
