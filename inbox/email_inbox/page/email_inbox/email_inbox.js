@@ -670,24 +670,23 @@ var link = me.wrapper.page.add_field({
     },
 	delete_email:function(me){
 		//could add flag to sync deletes but not going to as keeps history
-		var names = me.action_checked_items('.data("name")')
+		var names = $.map(me.action_checked_items('.data("name")'),function(v){return {n:v}})
 
-		me.action_checked_items('.parent()[0].remove()')
+		me.action_checked_items('.remove()')
+		me.update_local_flags(names,"deleted","1")
+		
 		me.refresh();
-		//me.update_local_flags(names,"deleted","1")
 
 	},
 	mark_unread:function(me){
-		var rows = me.action_checked_items('.data("data")')
-		var names = $.map(rows,function(v){return {n:v.name,u:v.uid}})
+		var names = $.map(me.action_checked_items('.data("data")'),function(v){return {n:v.name,u:v.uid}})
 		me.create_flag_queue(names,"-FLAGS","(\\SEEN)","seen")
 		me.action_checked_items('.css("font-weight", "BOLD")')
 		me.update_local_flags(names,"seen","0")
 	},
 	mark_read:function(me,data){
 		if (!data) {
-			var rows = me.action_checked_items('.data("data")')
-			var names = $.map(rows,function(v){return {n:v.name,u:v.uid}})
+			var names = $.map(me.action_checked_items('.data("data")'),function(v){return {n:v.name,u:v.uid}})
 			me.action_checked_items('.css("font-weight", "normal")')
 		} else{
 				var names = [data]
@@ -719,45 +718,9 @@ var link = me.wrapper.page.add_field({
 		})
 		$('.list-delete:checked').prop( "checked", false );
 	},
-	get_checked_items: function() {
-		return $.map(this.wrapper.page.main.find('.list-delete:checked'), function(e) {
-			return $(e).parents(".list-row").data('name');
-		});
-	},
 	action_checked_items: function(action) {
 		return $.map(this.wrapper.page.main.find('.list-delete:checked'), function(e) {
-			return eval('$(e).parents(".list-row")'+action);
+			return eval('$(e).closest(".row-named")'+action);
 		});
 	},
-	///unused////////////////////////////
-	add_field: function(df) {
-		var f = frappe.ui.form.make_control({
-			df: df,
-			only_input: df.fieldtype!="Check",
-		})
-		f.refresh();
-		$(f.wrapper)
-			.addClass('col-md-2')
-			.attr("title", __(df.label)).tooltip();
-		f.$input.addClass("input-sm").attr("placeholder", __(df.label));
-
-		if(df.fieldtype==="Check") {
-			$(f.wrapper).find(":first-child")
-				.removeClass("col-md-offset-4 col-md-8");
-		}
-
-		if(df.fieldtype=="Button") {
-			$(f.wrapper).find(".page-control-label").html("&nbsp;")
-			f.$input.addClass("btn-sm").css({"width": "100%", "margin-top": "-1px"});
-		}
-
-		if(df["default"])
-			f.set_input(df["default"])
-		this.fields_dict[df.fieldname || df.label] = f;
-		return f;
-	},
-	///unused////////////////////////////
-	notifyUser:function () {
-		frappe.utils.notify("subject","body text here",{},function(){console.log("hi")})
-	}
 });
