@@ -38,8 +38,8 @@ def push_email_to_user_emails(self, method=None):
 	else:
 		frappe.db.sql("""UPDATE `tabUser Emails` SET awaiting_password = 0
 								  WHERE email_account = %(account)s""", {"account": self.name})
-	from frappe.email import ask_pass_update
 	ask_pass_update()
+	
 @frappe.whitelist()
 def has_email_account(email):
 	return frappe.get_list("Email Account", filters={"email_id": email})
