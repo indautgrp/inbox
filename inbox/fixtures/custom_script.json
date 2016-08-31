@@ -1,0 +1,29 @@
+[
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Contact", 
+  "modified": "2016-08-22 17:29:20.552905", 
+  "name": "Contact-Client", 
+  "script": "frappe.ui.form.on(\"Contact\", {\nonload:function(frm){\n\t\tif(frappe.route_titles[\"update_contact\"])\n\t\t{\n\t\t\tfrappe.confirm(\"change email address from \"+cur_frm.doc.email_id+ \" to \"+frappe.route_titles[\"update_contact\"][\"email_id\"]\n\t\t\t\t,function(){\n\t\t\t\t\tcur_frm.doc.email_id = frappe.route_titles[\"update_contact\"][\"email_id\"];\n\t\t\t\t\tcur_frm.refresh();\n\t\t\t\t\tcur_frm.dirty();\n\t\t\t\t\tdelete frappe.route_titles[\"update_contact\"];\n\t\t\t\t},function(){\n\t\t\t\t\tdelete frappe.route_titles[\"update_contact\"];\n\t\t\t\t})\n\n\t\t}\n\t},\nvalidate: function(frm) {\n\t\tvar fieldlist = [\"supplier\",\"customer\",\"user\",\"organisation\"]\n\t\tif(frappe.route_titles[\"create_contact\"]==1&&!($.map(fieldlist,function(v){return frm.doc[v]?true:false}).indexOf(true)!=-1)){\n\t\t\t$.each(fieldlist,function(i,v){\t\t\t\n\t\t\t\tcur_frm.set_df_property(v,\"reqd\",1);\n\t\t\t})\n\t\t\n\t\t} else {\n\t\t\t$.each(fieldlist,function(i,v){\t\t\t\n\t\t\t\tcur_frm.set_df_property(v,\"reqd\",0);\n\t\t\t})\n\t\t}\n},\nafter_save:function(frm){\n\t\tif (frappe.route_titles[\"create_contact\"])\n\t\t{\n\t\t\tdelete frappe.route_titles[\"create_contact\"]\n\t\t\tfrappe.set_route(\"Email Inbox\");\n\t\t\tfrappe.route();\n\t\t}\n\t}\n});", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "User", 
+  "modified": "2016-08-30 17:53:08.815851", 
+  "name": "User-Client", 
+  "script": "frappe.ui.form.on('User',{\nrefresh:function(frm){\nif (frm.doc.user_emails){\n\t\t\tvar found =0\n\t\t\tfor (var i = 0;i<frm.doc.user_emails.length;i++){\n\t\t\t\tif (frm.doc.email==frm.doc.user_emails[i].email_id){\n\t\t\t\t\tfound = 1;\n\t\t\t\t}\n\t\t\t}\n\t\t\tfrm.get_field(\"create_user_email\").df.hidden = found;\n\t\t\tfrm.refresh_field(\"create_user_email\");\n\t\t}else{\n\t\t\tfrm.get_field(\"create_user_email\").df.hidden = 1\n\t\t}\n\t\tfrm.refresh_field(\"create_user_email\");\n\n\t\tif (frappe.route_titles[\"unsaved\"]===1){\n\t\t\tdelete frappe.route_titles[\"unsaved\"];\n\t\t\tfor ( var i=0;i<frm.doc.user_emails.length;i++){\n\t\t\t\tfrm.doc.user_emails[i].idx=frm.doc.user_emails[i].idx+1;\n\t\t\t}\n\t\t\tfrm.doc.email_account\n\t\tcur_frm.dirty();\n\t\t}\n},\ncreate_user_email:function(frm) {\n\t\tfrappe.call({\n\t\t\tmethod: 'inbox.email_inbox.user.has_email_account',\n\t\t\targs: {email:cur_frm.doc.email},\n\t\t\tcallback: function(r) {\n\t\t\t\tif (r[\"message\"]== undefined){\n\t\t\t\t\tvar doc = frappe.model.get_new_doc(\"Email Account\");\n\t\t\t\t\tfrappe.route_options = {\n\t\t\t\t\t\t\"email_id\": cur_frm.doc.email,\n\t\t\t\t\t\t\"awaiting_password\":1,\n\t\t\t\t\t\t\"enable_incoming\":1,\n\t\t\t\t\t\t\"append_to\":\"Communication\"\n\t\t\t\t\t};\n\t\t\t\t\tfrappe.route_titles[\"create user account\"]=cur_frm.doc.name;\n\t\t\t\t\tfrappe.set_route(\"Form\", \"Email Account\", doc.name);\n\t\t\t\t}else{\nfrappe.route_titles[\"create user account\"]=cur_frm.doc.name;\t\t\t\t\t\nfrappe.set_route(\"Form\", \"Email Account\", r[\"message\"][0][\"name\"]);\n\t\t\t\t}\n\t\t\t}\n\t\t})\n\n\t}\n});", 
+  "script_type": "Client"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Custom Script", 
+  "dt": "Email Account", 
+  "modified": "2016-08-30 17:37:46.042548", 
+  "name": "Email Account-Client", 
+  "script": "frappe.ui.form.on(\"Email Account\", {\nrefresh:function(frm){\nif (frm.doc.__islocal != 1) {\n\t\t\tif (frappe.route_titles[\"create user account\"]) {\n\t\t\t\tvar user =frappe.route_titles[\"create user account\"];\n\t\t\t\tdelete frappe.route_titles[\"create user account\"];\n\t\t\t\tvar userdoc = frappe.get_doc(\"User\",user);\n\t\t\t\tfrappe.model.with_doc(\"User\", user, function (doc) { //route[2]\n\t\t\t\t\tvar new_row = frappe.model.add_child(userdoc, \"User Emails\", \"user_emails\");\n\t\t\t\t\tnew_row.email_account = cur_frm.doc.name;\n\t\t\t\t\tnew_row.awaiting_password = cur_frm.doc.awaiting_password;\n\t\t\t\t\tnew_row.email_id = cur_frm.doc.email_id;\n\t\t\t\t\tnew_row.idx = 0;\n\t\t\t\t\tfrappe.route_titles = {\"unsaved\": 1};\n\t\t\t\t\tfrappe.set_route(\"Form\", \"User\",user);\n\t\t\t\t});\n            }\n        }\n}})", 
+  "script_type": "Client"
+ }
+]

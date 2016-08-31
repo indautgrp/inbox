@@ -10,15 +10,16 @@ app_color = "grey"
 app_email = "robert.schouten@ia-group.com.au"
 app_version = "0.0.1"
 app_license = "MIT"
+fixtures = ["Custom Field","Custom Script"]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/inbox/css/inbox.css"
-#app_include_js = [
-#"assets/js/desk2.min.js",
-#]
+app_include_js = [
+"assets/js/desk2.min.js",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/inbox/css/inbox.css"
@@ -45,7 +46,8 @@ app_license = "MIT"
 # ------------
 
 # before_install = "inbox.install.before_install"
-# after_install = "inbox.install.after_install"
+after_install = "inbox.install.link_communications_contacts.execute"
+
 
 # Desk Notifications
 # ------------------
@@ -69,7 +71,21 @@ notification_config = "inbox.email_inbox.notifications.get_notification_config"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
+doc_events = {
+	"Contact":{
+		"validate":"inbox.email_inbox.contact.contact_update_communication_ref"
+	},
+	"Communication":{
+		"after_insert":"inbox.email_inbox.contact.match_email_to_contact"
+	},
+	"User":{
+		"validate":"inbox.email_inbox.user.user_validate"
+	},
+	"Email Account":{
+		"validate":"inbox.email_inbox.user.push_email_to_user_emails"
+	}
+	
+}
 # 	"*": {
 # 		"on_update": "method",
 # 		"on_cancel": "method",

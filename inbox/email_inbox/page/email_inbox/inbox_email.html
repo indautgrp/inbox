@@ -3,7 +3,7 @@
         <!--{% if(data.doctype=="Communication" || data.comment_type=="Comment") { %}-->
             <div class="comment-header small" >
                 <!--<i class="{%= data.icon %} icon-fixed-width"></i>-->
-                <span title="{%= data.sender %}">{%= data.sender_full_name %}</span>
+                <span title="{%= data.sender %}">{%= data.sender_full_name?data.sender_full_name:data.sender %}</span>
                 <span class="text-muted" style="font-weight: normal;">
                     &ndash; {%= data.comment_on %}</span>
                 {% if(data.doctype=="Communication") { %}
