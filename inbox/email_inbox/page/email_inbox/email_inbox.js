@@ -290,6 +290,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			delete frappe.route_titles["update_contact"]
 			frappe.route_titles["create_contact"] = 1;
 			var name_split = row.sender_full_name?row.sender_full_name.split(' '):["",""];
+			row.nomatch = 1
 			var doc = frappe.model.get_new_doc("Contact");
 					frappe.route_options = {
 						"email_id": row.sender,
@@ -302,6 +303,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		d.get_input("updatecontact").on("click", function (frm) {
 			d.hide();
 			var name_split = row.sender_full_name.split(' ');
+			row.nomatch = 1
 			frappe.route_titles["update_contact"] = {
 						"email_id": row.sender
 			};
