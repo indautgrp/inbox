@@ -30,6 +30,7 @@ def user_emails_to_permissions(self, method=None):
 def get_awaiting_password(self):
 	ask_pass_update()
 
+#email account
 def push_email_to_user_emails(self, method=None):
 	if self.awaiting_password:
 		# push values to user_emails
@@ -39,7 +40,20 @@ def push_email_to_user_emails(self, method=None):
 		frappe.db.sql("""UPDATE `tabUser Emails` SET awaiting_password = 0
 								  WHERE email_account = %(account)s""", {"account": self.name})
 	ask_pass_update()
-	
+
+def ask_pass_update():
+	# update the sys defaults as to awaiting users
+	from frappe.utils import set_default
+	users = frappe.db.sql("""select DISTINCT(parent)
+    				from `tabUser Emails`
+    				where awaiting_password = 1""", as_list=1)
+
+	password_list = []
+	for u in users:
+		password_list.append(u[0])
+	set_default("email_user_password", u','.join(password_list))
+
+#for login
 @frappe.whitelist()
 def has_email_account(email):
 	return frappe.get_list("Email Account", filters={"email_id": email})
@@ -77,14 +91,3 @@ def set_email_password(email_account,user,password):
 			return False
 	return True
 
-def ask_pass_update():
-	# update the sys defaults as to awaiting users
-	from frappe.utils import set_default
-	users = frappe.db.sql("""select DISTINCT(parent)
-    				from `tabUser Emails`
-    				where awaiting_password = 1""", as_list=1)
-
-	password_list = []
-	for u in users:
-		password_list.append(u[0])
-	set_default("email_user_password", u','.join(password_list))

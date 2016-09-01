@@ -82,7 +82,7 @@ doc_events = {
 		"validate":"inbox.email_inbox.user.user_validate"
 	},
 	"Email Account":{
-		"validate":"inbox.email_inbox.user.push_email_to_user_emails"
+		"after_save":"inbox.email_inbox.user.push_email_to_user_emails"
 	}
 	
 }
