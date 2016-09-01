@@ -131,7 +131,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						me.toggle_actions();
 						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
-						me.filter_list.reload_stats();
+						if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 						me.refresh();
 					});
 	
@@ -148,7 +148,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						me.toggle_actions();
 						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
 						me.filter_list.clear_filters()
-						me.filter_list.reload_stats();
+						if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 						me.refresh();
 					});
 					me.wrapper.page.sidebar.removeClass("col-md-2").addClass("col-md-1").width('0%');
@@ -218,7 +218,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	update_footer:function(){
 		var me = this;
 		//default filter used for filters
-		var filters = me.filter_list.get_filters().concat(me.filter_list.default_filters)
+		var filters = me.filter_list.get_filters()
+		if (me.filter_list.default_filters){filters.concat(me.filter_list.default_filters)}
 		return frappe.call({
 			method: me.method || 'frappe.desk.query_builder.runquery',
 			type: "GET",
