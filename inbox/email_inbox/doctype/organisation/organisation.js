@@ -3,6 +3,12 @@
 
 frappe.ui.form.on('Organisation', {
 	refresh: function(frm) {
+		frm.toggle_display(['address_html','contact_html'], !frm.doc.__islocal);
 
+		if(!frm.doc.__islocal) {
+			erpnext.utils.render_address_and_contact(frm);
+		} else {
+			erpnext.utils.clear_address_and_contact(frm);
+		}
 	}
 });
