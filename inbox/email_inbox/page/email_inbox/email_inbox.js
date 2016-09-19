@@ -189,11 +189,11 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					me.relink(row);
 					return
 				}
-				if (row.timeline_label || row.nomatch) {
-					me.email_open(row);
-				} else {
-					me.company_select(row);
+				if($(btn.target).hasClass("company-link")) {
+					me.company_select(row,true);
+					return
 				}
+				me.email_open(row);
 			});
 	},
 	prepare_row:function(row){
@@ -341,24 +341,30 @@ frappe.Inbox = frappe.ui.Listing.extend({
                     "fieldname": "email"
                 }]
             });
+		//prompt for match
+		if (!row.timeline_label && !row.nomatch) {
+			setTimeout(function () {
+				if (frappe.ui.open_dialogs.indexOf(emailitem) != -1) {
+					me.company_select(row)
+				}}, 4000);
+		}
+		
 		var c = me.prepare_email(row);
 		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_email",  {data:c}));
 
+		//Action buttons
 		$(emailitem.$wrapper).find(".text-right").prepend(frappe.render_template("inbox_email_actions"));
-
-
 		$(emailitem.$wrapper).find(".relink-link").on("click", function () {
-			me.relink(row);
-		});
+			me.relink(row); });
 		$(emailitem.$wrapper).find(".company-link").on("click", function () {
-			me.company_select(row,true);
-		});
+			me.company_select(row,true);    });
 		me.add_reply_btn_event(emailitem, c);
 
-
+		//adjust sizing
 		$(".modal-dialog").addClass("modal-lg");
 		$(emailitem.$wrapper).find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-7 col-sm-8 col-md-9");
 		$(emailitem.$wrapper).find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-5 col-sm-4 col-md-3");
+		
 		emailitem.show();
 	},
 	add_reply_btn_event: function (emailitem, c) {
@@ -480,7 +486,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 								.attr("title","Linked Doctype: "+values["reference_doctype"])
 								row.reference_doctype = values["reference_doctype"]
 								row.reference_name = values["reference_name"]
-								
 								
 								return false;
 							}
