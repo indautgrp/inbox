@@ -51,9 +51,10 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					start: 0,
 					show_filters: true,
 				});
+			this.filter_list.add_filter("Communication", "deleted", "=", "No")
 			this.render_headers();
-			this.render_footer();
-			this.run()
+			this.render_footer();			
+			this.run();
 			this.render_buttons();
 			this.init_select_all();
 			var me = this;
@@ -119,7 +120,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</span> </div></div>';
 					buttons += rows;
 					me.account = me.allaccounts;
-					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
+					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account]]
 
 					me.wrapper.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
 					$(".inbox-select").click(function(btn){
@@ -129,8 +130,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						me.cur_page = 1;
 						$(me.wrapper.page.main).find(".list-select-all,.list-delete").prop("checked",false);
 						me.toggle_actions();
-						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
+						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account]]
 						me.filter_list.clear_filters()
+						me.filter_list.add_filter("Communication", "deleted", "=", "No")
 						if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 						me.refresh();
 					});
@@ -146,8 +148,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						me.cur_page = 1;
 						$(me.wrapper.page.main).find(".list-select-all,.list-delete").prop("checked",false);
 						me.toggle_actions();
-						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
+						me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account]]
 						me.filter_list.clear_filters()
+						me.filter_list.add_filter("Communication", "deleted", "=", "No");
 						if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 						me.refresh();
 					});
@@ -167,7 +170,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		// apply default filters, if specified for a listing
 		args.filters.push(["Communication", "communication_type", "=", "Communication"]);
 		args.filters.push(["Communication","email_account","in",this.account])
-		args.filters.push(["Communication", "deleted", "=", 0])
 
 		return args;
 	},
