@@ -3,13 +3,7 @@ import frappe
 
 def get_notification_config():
 	return {
-		"for_doctype": {
-			"Email Inbox": "inbox.email_inbox.notifications.get_unread_emails"
-		},
-		"for_module_doctypes": {
-			"Email Inbox": "inbox.email_inbox.notifications.get_unread_emails"
-		},
-		"for_module": {
+		"for_other": {
 			"Email Inbox": "inbox.email_inbox.notifications.get_unread_emails"
 		}
 	}

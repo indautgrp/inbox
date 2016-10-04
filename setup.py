@@ -13,14 +13,14 @@ with open('inbox/__init__.py', 'rb') as f:
 requirements = parse_requirements("requirements.txt", session="")
 
 setup(
-    name='inbox',
-    version=version,
-    description='Email Inbox for all users',
-    author='Robert Schouten',
-    author_email='robert.schouten@ia-group.com.au',
-    packages=find_packages(),
-    zip_safe=False,
-    include_package_data=True,
-    install_requires=[str(ir.req) for ir in requirements],
-    dependency_links=[str(ir._link) for ir in requirements if ir._link]
+	name='inbox',
+	version=version,
+	description='Email Inbox for all users',
+	author='Robert Schouten',
+	author_email='robert.schouten@ia-group.com.au',
+	packages=find_packages(),
+	zip_safe=False,
+	include_package_data=True,
+	install_requires=[str(ir.req) for ir in requirements],
+	dependency_links=[str(ir._link) for ir in requirements if ir._link]
 )
