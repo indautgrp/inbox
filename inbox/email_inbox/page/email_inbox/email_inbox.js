@@ -221,7 +221,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		var me = this;
 		//default filter used for filters
 		var filters = me.filter_list.get_filters()
-		if (me.filter_list.default_filters){filters.concat(me.filter_list.default_filters)}
+		if (me.filter_list.default_filters){filters = filters.concat(me.filter_list.default_filters)}
 		return frappe.call({
 			method: me.method || 'frappe.desk.query_builder.runquery',
 			type: "GET",
