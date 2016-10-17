@@ -1,7 +1,7 @@
 {
  "allow_copy": 0, 
  "allow_import": 0, 
- "allow_rename": 0, 
+ "allow_rename": 1, 
  "autoname": "field:organisation_name", 
  "creation": "2016-08-22 11:08:27.151412", 
  "custom": 0, 
@@ -140,7 +140,7 @@
  "issingle": 0, 
  "istable": 0, 
  "max_attachments": 0, 
- "modified": "2016-09-1 11:17:18.049218", 
+ "modified": "2016-10-13 11:17:18.049218", 
  "modified_by": "Administrator", 
  "module": "Email Inbox", 
  "name": "Organisation", 
