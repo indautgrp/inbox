@@ -160,9 +160,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	get_args: function(){
 		var args = {
 			doctype: this.doctype,
-			fields:["name", "sender", "sender_full_name", "actualdate", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment","timeline_hide"],
+			fields:["name", "sender", "sender_full_name", "communication_date", "recipients", "cc","communication_medium", "subject", "status" ,"reference_doctype","reference_name","timeline_doctype","timeline_name","timeline_label","sent_or_received","uid","message_id", "seen","nomatch","has_attachment","timeline_hide"],
 			filters: this.filter_list.get_filters(),
-			order_by: 'actualdate desc'
+			order_by: 'communication_date desc'
 		}
 
 		// apply default filters, if specified for a listing
@@ -258,25 +258,16 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				},
 				{
 					"fieldtype": "Button",
-					"label": __("Create new Contact"),
+					"label": __("Create/Add new Contact"),
 					"fieldname":"newcontact",
-					"description": __("Create new Contact for a Customer, Supplier, User or Organisation to Match")
+					"description": __('Create new Contact for a Customer, Supplier, User or Organisation to Match "') + row.sender + __('" Against')
 				},
-				{
-				"fieldtype": "Heading",
-				"label": __("Replace Email Address on Contact"),
-				"fieldname": "Option2"
-				},
-				{
-					"fieldtype": "Button",
-					"label": __("Update Existing Contact"),
-					"fieldname":"updatecontact"
-				}
+			
 				];
 		if (!nomatch) {
 			fields.push({
 				"fieldtype": "Heading",
-				"label": __("Do not Match yet"),
+				"label": __("Do not Match"),
 				"fieldname": "Option3"
 				})
 			fields.push({
@@ -303,16 +294,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						"status": "Passive"
 					};
 					frappe.set_route("Form", "Contact", doc.name);
-		});
-		d.get_input("updatecontact").on("click", function (frm) {
-			d.hide();
-			var name_split = row.sender_full_name.split(' ');
-			row.nomatch = 1
-			frappe.route_titles["update_contact"] = {
-						"email_id": row.sender
-			};
-			frappe.route_titles["create_contact"] = 1;
-			frappe.set_route("List", "Contact");
 		});
 		if (!nomatch) {
 			d.get_input("nomatch").on("click", function (frm) {
@@ -527,7 +508,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		});
 		c.doctype ="Communication";
 
-        c.comment_on = comment_when(c.actualdate);
+        c.comment_on = comment_when(c.communication_date);
 
 
         if (c.attachments && typeof c.attachments === "string")
