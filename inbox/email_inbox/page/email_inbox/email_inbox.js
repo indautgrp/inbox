@@ -428,7 +428,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				"options": "DocType",
 				"label": __("Reference Doctype"),
 				"fieldname": "reference_doctype",
-				"reqd": 1,
 				"get_query": function() {
 				return {
 						"query": lib +".get_communication_doctype"
@@ -439,7 +438,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					"fieldtype": "Dynamic Link",
 					"options": "reference_doctype",
 					"label": __("Reference Name"),
-					"reqd": 1,
 					"fieldname": "reference_name"
 				},
 				{
