@@ -86,7 +86,7 @@ doc_events = {
 		"validate":"inbox.email_inbox.user.user_validate"
 	},
 	"Email Account":{
-		"after_save":"inbox.email_inbox.user.push_email_to_user_emails"
+		"on_update":"inbox.email_inbox.user.push_email_to_user_emails"
 	}
 	
 }
@@ -137,3 +137,4 @@ doc_events = {
 # 	"frappe.desk.doctype.event.event.get_events": "inbox.event.get_events"
 # }
 
+mid_email_sync = "inbox.email_inbox.testsync"
