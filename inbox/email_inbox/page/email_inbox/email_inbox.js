@@ -372,7 +372,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				sender:sender,
 				subject: "Re: " + c.subject,
 				recipients: c.sender,
-				last_email: c
+				last_email: c,
+				attachments:c.attachments
 			});
         });
 //reply-all
@@ -393,7 +394,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				sender:sender,
 				subject: "Re: " + c.subject,
 				recipients: c.sender+ (c.cc ? ","+c.cc:""),
-				last_email: c
+				last_email: c,
+				attachments:c.attachments
 			});
         });
 //forward
@@ -405,7 +407,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					break;
 				}
 			}
-			new frappe.views.CommunicationComposer({
+			var communication = new frappe.views.CommunicationComposer({
 				doc: {
 					doctype: c.reference_doctype,
 					name: c.reference_name
@@ -414,8 +416,13 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				sender:sender,
 				subject: "FW: " + c.subject,
 				last_email: c,
-				forward:true
+				forward:true,
+				attachments:c.attachments
+				
 			});
+			
+			$(communication.dialog.fields_dict.select_attachments.wrapper).find("input[type=checkbox]").prop("checked",true)
+		
         });
     },
 	relink:function(row){
