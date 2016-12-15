@@ -316,7 +316,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	{
 		var me = this;
 		//mark email as read
-		this.mark_read(this,{n:row.name,u:row.uid});
+		this.mark_read({n:row.name,u:row.uid});
 		//start of open email
 
 		var emailitem = new frappe.ui.Dialog ({
@@ -341,6 +341,11 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		$(emailitem.$wrapper).find(".text-right").prepend(frappe.render_template("inbox_email_actions"));
 		$(emailitem.$wrapper).find(".relink-link").on("click", function () {
 			me.relink(row); });
+		$(emailitem.$wrapper).find(".delete-link").on("click", function () {
+			me.delete_email({n:row.name,u:row.uid}) 
+			emailitem.hide()
+		});
+		
 		$(emailitem.$wrapper).find(".company-link").on("click", function () {
 			me.company_select(row,true);    });
 		me.add_reply_btn_event(emailitem, c);
@@ -587,9 +592,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 	render_buttons: function(){
 		var me = this;
 
-		me.page.add_action_item("Delete",function(){me.delete_email(me)});
-		me.page.add_action_item("Mark as UnRead",function(){me.mark_unread(me)});
-		me.page.add_action_item("Mark as Read",function(){me.mark_read(me)});
+		me.page.add_action_item("Delete",function(){me.delete_email()});
+		me.page.add_action_item("Mark as UnRead",function(){me.mark_unread()});
+		me.page.add_action_item("Mark as Read",function(){me.mark_read()});
 
 		/*
 		me.page.add_menu_item("menu item1",function(){console.log("hi")},true)
@@ -669,23 +674,30 @@ var link = me.page.add_field({
 			$(me.page.btn_primary).show()
         }
     },
-	delete_email:function(me){
+	delete_email:function(data){
+		var me = this;
+		if (!data) {
+			var names = $.map(me.action_checked_items('.data("data")'),function(v){return {n:v.name,u:v.uid}})
+			me.action_checked_items('.remove()')
+		} else {
+			var names = [data]
+		}
 		//could add flag to sync deletes but not going to as keeps history
-		var names = $.map(me.action_checked_items('.data("name")'),function(v){return {n:v}})
-
-		me.action_checked_items('.remove()')
+		
 		me.update_local_flags(names,"deleted","1")
 		
 		me.refresh();
 
 	},
-	mark_unread:function(me){
+	mark_unread:function(){
+		var me = this;
 		var names = $.map(me.action_checked_items('.data("data")'),function(v){return {n:v.name,u:v.uid}})
 		me.create_flag_queue(names,"-FLAGS","(\\SEEN)","seen")
 		me.action_checked_items('.css("font-weight", "BOLD")')
 		me.update_local_flags(names,"seen","0")
 	},
-	mark_read:function(me,data){
+	mark_read:function(data){
+		var me = this;
 		if (!data) {
 			var names = $.map(me.action_checked_items('.data("data")'),function(v){return {n:v.name,u:v.uid}})
 			me.action_checked_items('.css("font-weight", "normal")')
