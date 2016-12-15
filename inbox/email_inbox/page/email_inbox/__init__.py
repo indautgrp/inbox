@@ -62,10 +62,10 @@ def create_flag_queue(names,action,flag,field):
 				try:
 					queue = frappe.db.sql("""select name,action,flag from `tabEmail Flag Queue`
 					where comm_name = %(name)s""",{"name":item["n"]},as_dict=1)
-					for item in queue:
-						if item.flag==flag:#is same email with same flag
-							if item.action!=action:#to prevent flag local and server states being out of sync
-								frappe.delete_doc("Email Flag Queue", item["n"])
+					for q in queue:
+						if q.flag==flag:#is same email with same flag
+							if q.action!=action:#to prevent flag local and server states being out of sync
+								frappe.delete_doc("Email Flag Queue", q.name)
 							raise Found
 	
 					flag_queue = frappe.get_doc({
