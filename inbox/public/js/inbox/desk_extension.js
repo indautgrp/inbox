@@ -54,7 +54,7 @@ frappe.Application = frappe.Application.extend({
                     "fieldname": "checking"
                 }]
 					});
-				s.fields_dict.checking.$wrapper.html('<i class="icon-spinner icon-spin icon-4x"></i>')
+				s.fields_dict.checking.$wrapper.html('<i class="fa fa-spinner fa-spin fa-4x"></i>')
 				s.show();
 				frappe.call({
 					method: 'inbox.email_inbox.user.set_email_password',

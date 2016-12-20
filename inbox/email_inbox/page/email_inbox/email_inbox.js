@@ -4,7 +4,7 @@ frappe.pages['Email Inbox'].on_page_load = function(wrapper) {
 	var page = frappe.ui.make_app_page({
 		parent: wrapper,
 		title: 'Email Inbox',
-		icon: 'icon-inbox',
+		icon: 'fa-inbox',
 		single_column: false
 	});
 
@@ -598,7 +598,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 
 		/*
 		me.page.add_menu_item("menu item1",function(){console.log("hi")},true)
-		me.page.add_action_icon("icon-download",function(){console.log("hi")})
+		me.page.add_action_icon("fa-download",function(){console.log("hi")})
 		*/
 		me.page.set_primary_action("New Email",function(){
 			var sender = ""
@@ -613,10 +613,10 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					sender: sender,
 					txt: "",
 			});
-		},"icon-plus","New Email")
+		},"fa-plus","New Email")
 
 		/*
-		me.page.set_secondary_action("secondary action",function(){console.log("secondary action")},"icon-inbox","working label")
+		me.page.set_secondary_action("secondary action",function(){console.log("secondary action")},"fa-inbox","working label")
 
 
 		me.download = me.page.add_field({
@@ -625,7 +625,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						fieldname: "download",
 						label: __("Download"),
 						fieldtype: "Button",
-						icon: "icon-angle-double-left"
+						icon: "fa-angle-double-left"
 					});
 		me.download.$input.on("click", function() {
 
