@@ -106,24 +106,24 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			args:{user:frappe.user["name"]},
 			async:false,
 			callback:function(list){
-				var buttons = '<div class="layout-main-section">';
+				var buttons = '<div class="layout-main-section overlay-sidebar">';
 				if (list["message"]){
 					me.accounts = [];
 					var rows = "";
 
 					for (var i = 0;i<list["message"].length;i++)
 					{
-						rows += '<div class="list-row inbox-select"> <div class="row"><span class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</span> </div></div>';
+						rows += '<div class="list-row inbox-select"> <div class="row"><a class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</a> </div></div>';
 						me.accounts.push({name:list["message"][i]["email_account"],email:list["message"][i]["email_id"]})
 					}
 					me.allaccounts = $.map(me.accounts,function(v){return v.name}).join(",")
-					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><span class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</span> </div></div>';
+					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><a class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</a> </div></div>';
 					buttons += rows;
 					me.account = me.allaccounts;
 					me.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account]]
 
-					me.page.sidebar.append(buttons).addClass('hidden-sm hidden-xs');
-					$(".inbox-select").click(function(btn){
+					me.page.sidebar.empty().append(buttons);
+					$(".inbox-select").on("click",function(btn){
 						me.account = $(btn.currentTarget).find(".inbox-item").data("account");
 						$(me.page.sidebar).find(".list-row").removeClass("list-row-head").css("font-weight","normal");
 						$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
@@ -136,23 +136,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 						me.refresh();
 					});
-	
-					//for mobile sidemenu
-					// $(".form-sidebar").show();
-					// $(".sidebar-left").find(".form-sidebar").append(buttons);
-					//
-					// $(".form-sidebar").find(".inbox-select").click(function(btn){
-					// 	me.account = $(btn.currentTarget).find(".inbox-item").data("account");
-					// 	$(".form-sidebar").find(".list-row").removeClass("list-row-head").css("font-weight","normal");
-					// 	$(btn.currentTarget).closest(".list-row").addClass("list-row-head").css("font-weight","bold");
-					// 	me.cur_page = 1;
-					// 	$(me.page.main).find(".list-select-all,.list-delete").prop("checked",false);
-					// 	me.toggle_actions();
-					// 	me.filter_list.default_filters=[["Communication", "communication_type", "=", "Communication"],["Communication", "email_account", "in", me.account],["Communication", "deleted", "=", 0]]
-					// 	me.filter_list.clear_filters()
-					// 	if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
-					// 	me.refresh();
-					// });
 				}
 			}
         })
@@ -336,7 +319,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		
 		var c = me.prepare_email(row);
 		emailitem.fields_dict.email.$wrapper.html( frappe.render_template("inbox_email",  {data:c}));
-
+      $(emailitem.$wrapper).find(".reply").find("a").attr("target","_blank")
+		
 		//Action buttons
 		$(emailitem.$wrapper).find(".text-right").prepend(frappe.render_template("inbox_email_actions"));
 		$(emailitem.$wrapper).find(".relink-link").on("click", function () {
