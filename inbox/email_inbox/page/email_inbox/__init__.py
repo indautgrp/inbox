@@ -104,7 +104,7 @@ def get_length(email_account):
 def get_accounts(user):
 	try:
 		return frappe.db.sql("""SELECT email_account,email_id
-		FROM `tabUser Email`
+		FROM `tabUser Emails`
 		WHERE parent = %(user)s
 		ORDER BY idx""", {"user": user}, as_dict=1)
 	except:
