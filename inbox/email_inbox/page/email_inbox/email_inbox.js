@@ -186,15 +186,18 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					me.relink(row);
 					return
 				}
-				if($(btn.target).hasClass("company-link")) {
-					me.company_select(row, true);
-					return
+				if(me.account!="Sent") {
+					if ($(btn.target).hasClass("company-link")) {
+						me.company_select(row, true);
+						return
+					}
 				}
 				me.email_open(row);
 			});
 	},
 	prepare_row:function(row){
 		row.hascompany =(row.customer || row.supplier) ? true : false;
+		row.seen = this.account!="Sent" ? row.seen : 1;
 	},
 	render_footer:function(){
 		var me = this;
@@ -324,7 +327,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		me.open_email = row.name
 		
 		//mark email as read
-		this.mark_read(row);
+		if(me.account!="Sent") {
+			this.mark_read(row);
+		}
 		//start of open email
 
 		var emailitem = new frappe.ui.Dialog ({
@@ -335,7 +340,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
                 }]
             });
 		//prompt for match
-		if (!row.timeline_label && !row.nomatch) {
+		if (!row.timeline_label && !row.nomatch && me.account!="Sent") {
 			setTimeout(function () {
 				if (frappe.ui.open_dialogs.indexOf(emailitem) != -1 && !me.actions_opened) {
 					me.company_select(row)
