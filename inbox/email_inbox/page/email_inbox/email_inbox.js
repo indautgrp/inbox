@@ -361,7 +361,10 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			me.delete_email({n:row.name, u:row.uid});
 			emailitem.hide()
 		});
-		
+		$(emailitem.$wrapper).find(".print-link").on("click", function () {
+			var newWindow = window.open();
+			newWindow.document.write(frappe.render_template("print_email", {data:c}))
+		});
 		$(emailitem.$wrapper).find(".company-link").on("click", function () {
 			me.company_select(row, true)});
 		me.add_reply_btn_event(emailitem, c);
