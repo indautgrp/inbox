@@ -545,12 +545,13 @@ frappe.Inbox = frappe.ui.Listing.extend({
 
 		c.comment = c.content;
         if (c.comment_type == "Email") {
-            c.comment = c.comment.split("<!-- original-reply -->")[0];
+        	//should show full email content from past emails in inbox
+            //c.comment = c.comment.split("<!-- original-reply -->")[0];
             c.comment = frappe.utils.strip_original_content(c.comment);
             c.comment = frappe.dom.remove_script_and_style(c.comment);
 
             c.original_comment = c.comment;
-            c.comment = frappe.utils.toggle_blockquote(c.comment);
+            //c.comment = frappe.utils.toggle_blockquote(c.comment);
         }
 
 
