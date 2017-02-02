@@ -17,15 +17,13 @@ frappe.pages['Email Inbox'].on_page_load = function(wrapper) {
 
 		});
 	});
-}
-
-//frappe.breadcrumbs.add("Setup");
+};
 
 frappe.pages['Email Inbox'].refresh = function(wrapper) {
 	if (wrapper.inbox) {
 		wrapper.Inbox.refresh()
 	}
-}
+};
 
 frappe.Inbox = frappe.ui.Listing.extend({
     init: function(opts) {
@@ -85,16 +83,16 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				}
 				me.fresh = false
 			});
-		}else{
-			alert("No Email Account assigned to you contact your System administrator");
-			if (frappe.session.user==="Administrator")
-			{
-				frappe.set_route("List", "User");
-			}
-			else
-			{
-				window.history.back();
-			}
+		} else {
+			frappe.msgprint(__("No Email Account assigned to you. Please contact your System Administrator"));
+
+			setTimeout(function() {
+				if (frappe.session.user==="Administrator") {
+					frappe.set_route("List", "User");
+				} else {
+					frappe.set_route('');
+				}
+			}, 3000);
 		}
     },
 	refresh:function(){
@@ -124,7 +122,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						rows += '<div class="list-row inbox-select"> <div class="row"><a class="inbox-item text-ellipsis col-md-12" title ="'+list["message"][i]["email_id"]+'" data-account="'+list["message"][i]["email_account"]+'" style="margin-left: 10px;">'+list["message"][i]["email_id"]+'</a> </div></div>';
 						me.accounts.push({name:list["message"][i]["email_account"],email:list["message"][i]["email_id"]})
 					}
-					me.allaccounts = $.map(me.accounts,function(v){return v.name}).join(",")
+					me.allaccounts = $.map(me.accounts,function(v){return v.name}).join(",");
 					buttons += '<div class="list-row inbox-select list-row-head" style="font-weight:bold"> <div class="row"><a class="inbox-item text-ellipsis col-md-12 " title ="All Accounts" data-account="'+me.allaccounts+'" style="margin-left: 10px;">All Accounts</a> </div></div>';
 					buttons += rows;
 					buttons += '<div class="list-row inbox-select"> <div class="row"><a class="inbox-item text-ellipsis col-md-12 " title ="Sent" data-account="Sent" style="margin-left: 10px;">Sent</a> </div></div>';
@@ -253,7 +251,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				} else {
 					me.footer.hide();
 				}
-				$('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + (
+				$('.footer-numbers').html('Showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + (
 					(me.data_length > (me.cur_page * me.page_length)) ? (me.cur_page * me.page_length) : me.data_length) + ' of ' + me.data_length);
 			},
 			no_spinner: this.no_loading
@@ -273,7 +271,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					"fieldname":"newcontact",
 					"description": __('Create new Contact for a Customer, Supplier, User or Organisation to Match "') + row.sender + __('" Against')
 				}
-			
+
 				];
 		if (!nomatch) {
 			fields.push({
@@ -297,7 +295,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			frappe.route_titles["create_contact"] = 1;
 			var name_split = row.sender_full_name?row.sender_full_name.split(' '):["",""];
 			row.nomatch = 1;
-			
+
 			frappe.route_options = {
 				"email_id": row.sender,
 				"first_name": name_split[0],
@@ -334,7 +332,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			return
 		}
 		me.open_email = row.name
-		
+
 		//mark email as read
 		if(me.account!="Sent") {
 			this.mark_read(row);
@@ -355,7 +353,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					me.company_select(row)
 				}}, 4000);
 		}
-		
+
 		var c = me.prepare_email(row);
 		emailitem.fields_dict.email.$wrapper.html(frappe.render_template("inbox_email", {data:c}));
       $(emailitem.$wrapper).find(".reply").find("a").attr("target", "_blank");
@@ -382,12 +380,12 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		$(".modal-dialog").addClass("modal-lg");
 		$(emailitem.$wrapper).find(".modal-title").parent().removeClass("col-xs-7").addClass("col-xs-7 col-sm-8 col-md-9");
 		$(emailitem.$wrapper).find(".text-right").parent().removeClass("col-xs-5").addClass("col-xs-5 col-sm-4 col-md-3");
-		
+
 		//setup close
 		emailitem.onhide = function() {
 			me.open_email = null
 		}
-		
+
 		emailitem.show();
 	},
 	add_reply_btn_event: function (emailitem, c) {
@@ -454,7 +452,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				forward:true,
 				attachments:c.attachments
 			});
-	
+
 			$(communication.dialog.fields_dict.select_attachments.wrapper).find("input[type=checkbox]").prop("checked",true)
         });
     },
@@ -557,7 +555,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 
 		c.comment = c.content;
         if (c.comment_type == "Email") {
-        	//should show full email content from past emails in inbox
+           //should show full email content from past emails in inbox
             //c.comment = c.comment.split("<!-- original-reply -->")[0];
             c.comment = frappe.utils.strip_original_content(c.comment);
             c.comment = frappe.dom.remove_script_and_style(c.comment);
@@ -694,7 +692,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			var names = [{name:data.name, uid:data.uid}]
 		}
 		//could add flag to sync deletes but not going to as keeps history
-		
+
 		me.update_local_flags(names, "deleted", "1")
 	},
 	mark_unread:function(){

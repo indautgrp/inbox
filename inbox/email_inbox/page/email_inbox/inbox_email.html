@@ -1,8 +1,6 @@
 <div class="pull-left media-body" style="max-width: 100%; padding-right: 0px;min-height: 200px;">
     <div class="media-content-wrapper">
-        <!--{% if(data.doctype=="Communication" || data.comment_type=="Comment") { %}-->
             <div class="comment-header small" >
-                <!--<i class="{%= data.icon %} icon-fixed-width"></i>-->
                 <span title="{%= data.sender %}">{%= data.sender_full_name?data.sender_full_name:data.sender %}</span>
                 <span class="text-muted" style="font-weight: normal;">
                     &ndash; {%= data.comment_on %}</span>
@@ -35,16 +33,6 @@
                     </a>
                     {% } %}
                 {% } %}
-                <!--liked
-                <span class="comment-likes" data-liked-by=\'{{ JSON.stringify(data._liked_by) }}\'>
-                    <i class="octicon octicon-heart like-action
-                        {% if (!data.liked_by_user) { %}
-                            text-extra-muted not-liked
-                        {% } %} "
-                        data-doctype="{%= data.doctype %}"
-                        data-name="{%= data.name %}"></i>
-                    <span class="likes-count text-muted">{{ data._liked_by.length }}</span>
-                </span>-->
             </div>
 
         {% if(data.attachments && data.attachments.length) { %}
