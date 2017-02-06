@@ -71,7 +71,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						frappe.utils.notify(data.account, "you have "+data.number+" new emails", {}, function () {
 							window.focus();
 							me.account = data.account;
-							$(me.wrapper).find('.inbox-select[data-account="' + data.account + '" ]').trigger("click")
+							$(me.page.sidebar).find('.inbox-select[data-account="' + data.account + '" ]').trigger("click")
 						});
 						if(!me.fresh &&(data.account == me.account || me.account == me.allaccounts)) {
 							me.fresh = true;
@@ -127,8 +127,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				["Communication", "sent_or_received", "=", "Received"]];
 
 			me.page.sidebar.empty().append(buttons);
-			$(me.wrapper).find('.inbox-select[data-account="' + me.allaccounts + '" ]').addClass("list-row-head").css("font-weight","bold");
-			$(me.wrapper).find(".inbox-select").on("click",function(btn){
+			$(me.page.sidebar).find('.inbox-select[data-account="' + me.allaccounts + '" ]').addClass("list-row-head").css("font-weight","bold");
+			$(me.page.sidebar).find(".inbox-select").on("click",function(btn){
 				me.account = $(btn.currentTarget).data("account");
 				$(me.page.sidebar).find(".inbox-select").removeClass("list-row-head").css("font-weight","normal");
 				$(btn.currentTarget).addClass("list-row-head").css("font-weight","bold");
@@ -727,7 +727,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				val:val
 			}
 		});
-		$(me.wrapper).find('.list-delete:checked').prop( "checked", false );
+		$(this.wrapper).find('.list-delete:checked').prop( "checked", false );
 	},
 	action_checked_items: function(action) {
 		return $.map(this.page.main.find('.list-delete:checked'), function(e) {
