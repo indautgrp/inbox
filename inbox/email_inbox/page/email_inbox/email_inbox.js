@@ -208,7 +208,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			bootstrapMajorVersion:3,
 			onPageClicked: function(e,originalEvent,type,page){
 				me.cur_page = page;
-				$(me.wrapper).find('.footer-numbers').html('showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + (
+				$(me.wrapper).find('.footer-numbers').html('Showing: ' + (me.cur_page - 1) * me.page_length + ' to ' + (
 					(me.data_length > (me.cur_page * me.page_length))?(me.cur_page * me.page_length):me.data_length) + ' of ' + me.data_length);
 				me.run(true,true);
 			}
