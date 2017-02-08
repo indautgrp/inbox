@@ -35,6 +35,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		this.start = 0;
 		this.cur_page = 1;
 		this.no_result_message = 'No Emails to Display';
+		this.list_settings_key = frappe.session.user + "inbox"
 		//check if mailto link
 		var email = frappe.get_route_str().split("?")
 			if (email.length>1){
@@ -58,10 +59,10 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					start: 0,
 					show_filters: true
 				});
-			this.filter_list.add_filter("Communication", "deleted", "=", "No");
+
 			this.render_headers();
+			this.get_list_settings();
 			this.render_footer();
-			this.run();
 			this.render_buttons();
 			this.init_select_all();
 			var me = this;
@@ -94,6 +95,17 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		}
     },
 	refresh:function(){
+    	var me = this
+		me.filter_list.remove_filter("email_account",false)
+		me.filter_list.remove_filter("sent_or_received",false)
+		me.filter_list.default_filters = [["Communication", "communication_type", "=", "Communication"]]
+		//set filters for all account options
+		if(me.account == "Sent"){
+			me.filter_list.default_filters.push(["Communication", "sent_or_received", "=", "Sent"])
+		}else{
+			me.filter_list.default_filters.push(["Communication", "email_account", "in", me.account]);
+			me.filter_list.default_filters.push(["Communication", "sent_or_received", "=", "Received"]);
+		}
     	delete frappe.route_titles["create_contact"];
 		delete frappe.route_titles["update_contact"];
 		this.run();
@@ -121,10 +133,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			buttons += rows;
 			buttons += frappe.render_template("inbox_sidebar_row", {name: "Sent", email: "Sent"});
 			me.account = me.allaccounts;
-			me.default_filters=[
-				["Communication", "communication_type", "=", "Communication"],
-				["Communication", "email_account", "in", me.account],
-				["Communication", "sent_or_received", "=", "Received"]];
 
 			me.page.sidebar.empty().append(buttons);
 			$(me.page.sidebar).find('.inbox-select[data-account="' + me.allaccounts + '" ]').addClass("list-row-head").css("font-weight","bold");
@@ -136,23 +144,35 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				$(me.page.main).find(".list-select-all,.list-delete").prop("checked",false);
 				me.toggle_actions();
 
-				if(me.account=="Sent"){
-					me.filter_list.default_filters=[
-						["Communication", "communication_type", "=", "Communication"],
-						["Communication", "sent_or_received", "=", "Sent"]]
-				}else {
-					me.filter_list.default_filters = [
-						["Communication", "communication_type", "=", "Communication"],
-						["Communication", "email_account", "in", me.account],
-						["Communication", "sent_or_received", "=", "Received"]];
-				}
-				me.filter_list.clear_filters();
-				me.filter_list.add_filter("Communication", "deleted", "=", "No");
-				if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
 				me.refresh();
+				me.filter_list.loaded_stats = false
+				me.filter_list.hide_filter_list()
+				//if (me.filter_list.reload_stats){me.filter_list.reload_stats()}
+				
 			});
 		}
     },
+	get_list_settings: function(){
+		var me = this;
+		frappe.call({
+			method: 'inbox.email_inbox.page.email_inbox.get_list_settings',
+			args: {
+				key: this.list_settings_key	
+			},
+			callback:function(r){
+				if (r && r.message){
+					me.list_settings = JSON.parse(r.message)
+					me.filter_list.clear_filters();
+					$.each(me.list_settings.filters, function(i, f){
+						if(["email_account", "sent_or_received", "communication_type"].indexOf(f[1]) == -1){
+							me.filter_list.add_filter(f[0], f[1], f[2], f[3]);
+						}
+					});
+				}
+				me.refresh()
+			}
+		})
+	},
 	get_args: function(){
 		var args = {
 			doctype: this.doctype,
@@ -161,7 +181,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 				"timeline_label", "sent_or_received", "uid", "message_id", "seen", "nomatch", "has_attachment", "timeline_hide"],
 			filters: this.filter_list.get_filters(),
 			order_by: 'communication_date desc',
-			save_list_settings: false
+			save_list_settings: true,
+			save_list_key: this.list_settings_key
 		};
 
 		args.filters = args.filters.concat(this.filter_list.default_filters);
