@@ -168,6 +168,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 							me.filter_list.add_filter(f[0], f[1], f[2], f[3]);
 						}
 					});
+				}else{
+					//add standard filter for accounts
+					me.filter_list.add_filter("Communication", "deleted", "=", "No");
 				}
 				me.refresh()
 			}
