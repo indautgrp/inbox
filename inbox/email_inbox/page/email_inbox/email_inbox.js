@@ -72,7 +72,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 						frappe.utils.notify(data.account, "you have "+data.number+" new emails", {}, function () {
 							window.focus();
 							me.account = data.account;
-							$(me.page.sidebar).find('.inbox-select[data-account="' + data.account + '" ]').trigger("click")
+							$(me.page.sidebar).find('.inbox-select[data-account="' + data.account_name + '" ]').trigger("click")
 						});
 						if(!me.fresh &&(data.account == me.account || me.account == me.allaccounts)) {
 							me.fresh = true;
