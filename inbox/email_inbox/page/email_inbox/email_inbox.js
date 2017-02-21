@@ -41,7 +41,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			if (email.length>1){
 				window.location.hash = window.location.hash.split("?")[0]
 				if (email.length >2){
-					var params = get_query_params(email[2])
+					var params = get_query_params(email[2], true)
 				}
 				new frappe.views.CommunicationComposer({
 					doc: {},
