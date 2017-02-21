@@ -37,12 +37,18 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		this.no_result_message = 'No Emails to Display';
 		this.list_settings_key = frappe.session.user + "inbox"
 		//check if mailto link
-		var email = frappe.get_route_str().split("?")
+		var email = decodeURIComponent(frappe.get_route_str()).split("?")
 			if (email.length>1){
 				window.location.hash = window.location.hash.split("?")[0]
+				if (email.length >2){
+					var params = get_query_params(email[2])
+				}
 				new frappe.views.CommunicationComposer({
 					doc: {},
 					recipients: email[1].replace("mailto:",""),
+					cc: params.cc || "",
+					subject: params.subject || "",
+					content: params.body || ""
 				});
 			}
 
