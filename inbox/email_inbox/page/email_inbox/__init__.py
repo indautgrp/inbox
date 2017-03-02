@@ -14,10 +14,6 @@ def get_email_content(name):
 	return docinfo, content
 
 @frappe.whitelist()
-def get_list_settings(key):
-	list_settings = frappe.cache().hget('_list_settings','{0}::{1}'.format(key, frappe.session.user))
-	return list_settings
-@frappe.whitelist()
 def create_flag_queue(names, action, flag, field):
 	names = json.loads(names)
 
@@ -65,24 +61,3 @@ def get_length(email_account):
 			WHERE deleted = 0 AND email_account= %(email_account)s""", {"email_account": email_account})
 	except:
 		return 0
-
-@frappe.whitelist()
-def get_accounts(user):
-	try:
-		return frappe.db.sql("""SELECT email_account,email_id
-		FROM `tabUser Emails`
-		WHERE parent = %(user)s
-		ORDER BY idx""", {"user": user}, as_dict=1)
-	except:
-		return
-
-# for the selection/deletion of multiple items
-def set_multiple_status(names, status):
-	names = json.loads(names)
-	for name in names:
-		set_status(name, status)
-
-def set_status(name, status):
-	st = frappe.get_doc("Issue", name)
-	st.status = status
-	st.save()

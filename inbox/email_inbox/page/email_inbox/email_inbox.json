@@ -5,12 +5,12 @@
  "doctype": "Page", 
  "icon": "icon-inbox", 
  "idx": 0, 
- "modified": "2016-04-14 10:22:57.308665", 
+ "modified": "2017-01-15 22:46:18.276855", 
  "modified_by": "Administrator", 
  "module": "Email Inbox",
- "name": "Email Inbox",
+ "name": "email_inbox",
  "owner": "Administrator", 
- "page_name": "Email Inbox", 
+ "page_name": "email_inbox", 
  "roles": [
   {
    "role": "All"
