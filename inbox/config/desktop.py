@@ -8,7 +8,7 @@ def get_data():
 			"color": "grey",
 			"icon": "octicon octicon-mail",
 			"type": "page",
-			"link": "Email Inbox",
+			"link": "email_inbox",
 			"label": _("Email Inbox")
 		}
 	}
