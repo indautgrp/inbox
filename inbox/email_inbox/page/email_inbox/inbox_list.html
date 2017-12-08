@@ -1,11 +1,13 @@
 <div class="list-row row-named" data-name="{%= data.name %}" style=" {%= data.seen ? "font-weight:normal" : "font-weight:bold" %}">
-    <div class="row doclist-row  has-checkbox">
+    <div class="row doclist-row has-checkbox">
         <div class="col-mg-5  col-sm-12  list-row-left">
             <div class="row">
                 <div class="col-sm-2 list-col text-ellipsis col-xs-12">
                     <span class="list-value">
-                        <input class="list-delete noclick" type="checkbox" style="margin: 0 7px 0 0; vertical-align: middle;">
-                        {% if (data.sender_full_name){var sender = data.sender_full_name} else {var sender =  data.sender} %}
+                        <label class="noclick" for="check{%= data.name %}" style="margin:-10px;padding:10px;">
+                        <input id="check{%= data.name %}" class="list-delete noclick" type="checkbox" style="margin: 0px 7px 0px 0px; vertical-align: middle;">
+                        </label>
+                            {% if (data.sender_full_name){var sender = data.sender_full_name} else {var sender =  data.sender} %}
                         <a class="grey"  title="{%= sender %}">{%= sender %}</a>
                     </span>
                 </div>
