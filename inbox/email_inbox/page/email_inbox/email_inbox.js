@@ -116,9 +116,15 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		this.run();
 	},
 	render_headers: function(){
+		var me = this;
 		this.page.main.parent().css("padding-left","0px").css("padding-right","0px");
 		var data = {"start":this.start,"page_length":this.page_length.toString()};
-		this.list_header = $(frappe.render_template("inbox_headers", data)).appendTo(this.page.main.find(".list-headers"));
+		this.list_header = $(frappe.render_template("inbox_headers", data)).appendTo(this.page.main.find(".list-headers"))
+			.on("click", ".list-header-filter", function() {
+				var fieldname = $(this).attr('data-name');
+				me.filter_list.add_filter(me.doctype,fieldname);
+				me.filter_list.filters[0].wrapper.find(".filter_field input").focus();
+			});;
     },
 	render_sidemenu: function () {
 		var me = this;
