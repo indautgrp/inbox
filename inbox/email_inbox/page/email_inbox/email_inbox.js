@@ -39,8 +39,9 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		var email = decodeURIComponent(frappe.get_route_str()).split("?");
 		if (email.length>1){
 			window.location.hash = window.location.hash.split("?")[0];
+			var params = ""
 			if (email.length >2){
-				var params = get_query_params(email[2], true)
+				params = get_query_params(email[2], true)
 			}
 			new frappe.views.CommunicationComposer({
 				doc: {},
