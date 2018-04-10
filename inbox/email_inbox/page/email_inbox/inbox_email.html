@@ -33,6 +33,15 @@
                     </a>
                     {% } %}
                 {% } %}
+                
+                <div>
+                    {% if (data.recipients) { %}
+                    <span style="padding-left:10px;">{%= __("To") %}: {%= data.recipients%}</span>
+                    {% } %}
+                    {% if (data.cc) { %}
+                    <span style="padding-left:10px;">{%= __("CC") %}: {%= data.cc%}</span>
+                    {% } %}
+                </div>
             </div>
 
         {% if(data.attachments && data.attachments.length) { %}
