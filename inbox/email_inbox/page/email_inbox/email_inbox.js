@@ -382,7 +382,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		$(emailitem.$wrapper).find(".relink-link").on("click", function () {
 			me.relink(row); });
 		$(emailitem.$wrapper).find(".delete-link").on("click", function () {
-			me.delete_email({n:row.name, u:row.uid});
+			me.delete_email({name:row.name, uid:row.uid});
 			emailitem.hide()
 		});
 		$(emailitem.$wrapper).find(".print-link").on("click", function () {
@@ -744,6 +744,8 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		})
 	},
 	update_local_flags:function(names,field,val){
+		console.log(names)
+		console.log(field)
 		frappe.call({
 			method: 'inbox.email_inbox.page.email_inbox.update_local_flags',
 			args:{

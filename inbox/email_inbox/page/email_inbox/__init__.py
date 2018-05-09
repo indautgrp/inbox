@@ -51,7 +51,7 @@ def setnomatch(name):
 def update_local_flags(names, field, val):
 	names = json.loads(names)
 	for d in names:
-		frappe.db.set_value("Communication", str(d["name"]), field, val, update_modified=False)
+		frappe.db.set_value("Communication", str(d["name"]), field, val, update_modified=True)
 
 @frappe.whitelist()
 def get_length(email_account):
