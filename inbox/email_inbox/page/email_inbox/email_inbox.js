@@ -430,21 +430,28 @@ frappe.Inbox = frappe.ui.Listing.extend({
         });
 //reply-all
 		$(emailitem.$wrapper).find(".reply-all-link").on("click", function () {
-            var sender = "";
-			for (var i=0;i<me.accounts.length;i++){
-				if(me.accounts[i].name===me.account){
-					sender =  me.accounts[i].email;
-					break;
-				}
+            var senderName = frappe.user_info(frappe.session.user).fullname.toLowerCase();
+            var senderEmail = frappe.user_info(frappe.session.user).email;
+            var sender = "'" + senderName + "'" + " " + "<" + senderEmail + ">";
+			var recipients = (c.sender + (c.recipients ? ", "+c.recipients:"") + (c.cc ? ", "+c.cc:""))
+				.toLowerCase()
+				.replace(sender,"")
+				.replace(senderName + " " + "<" + senderEmail + ">")
+				.replace(senderEmail,"");
+            
+			if (recipients.slice(-2) === ", ")
+			{
+				recipients = recipients.substring(0, recipients.lastIndexOf(", "));
 			}
+			
 			new frappe.views.CommunicationComposer({
 				doc: {
 					doctype: c.reference_doctype,
 					name: c.reference_name
 				},
 				sender:sender,
-				subject: "Re: " + c.subject,
-				recipients: (c.sender + (c.recipients ? ", "+c.recipients:"") + (c.cc ? ", "+c.cc:"")).replace(sender,""),
+				subject: "Re: " + c.subject + " ",
+				recipients: recipients,
 				last_email: c,
 				attachments:c.attachments
 			});
