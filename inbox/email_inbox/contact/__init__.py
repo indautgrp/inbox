@@ -6,7 +6,7 @@ def contact_update_communication_ref(self, method=None):
 	                                     as_dict=1)
 
 	if self.email_id:
-		self.email_id = self.email_id.lower()
+		self.email_id = self.email_id.strip().lower()
 		comm = frappe._dict({"email_id": self.email_id,
 		                     "name": self.name,
 		                     "supplier": self.supplier,
@@ -88,7 +88,7 @@ def contact_update_communication_ref(self, method=None):
 def match_email_to_contact(doc, method=None):
 	if doc.communication_type == "Communication":
 		origin_contact = frappe.db.sql(
-			"select name,email_id,supplier,supplier_name, customer,customer_name,user,organisation from `tabContact` where email_id <>''",
+			"select name,trim(email_id) as email_id,supplier,supplier_name, customer,customer_name,user,organisation from `tabContact` where email_id <>''",
 			as_dict=1)
 		for comm in origin_contact:
 			if comm.email_id:
