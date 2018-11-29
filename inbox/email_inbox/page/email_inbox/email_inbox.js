@@ -436,7 +436,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 			var recipients = (c.sender + (c.recipients ? ", "+c.recipients:"") + (c.cc ? ", "+c.cc:""))
 				.toLowerCase()
 				.replace(sender,"")
-				.replace(senderName + " " + "<" + senderEmail + ">")
+				.replace(senderName + " " + "<" + senderEmail + ">", "")
 				.replace(senderEmail,"");
             
 			if (recipients.slice(-2) === ", ")
@@ -450,7 +450,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 					name: c.reference_name
 				},
 				sender:sender,
-				subject: "Re: " + c.subject + " ",
+				subject: "Res: " + c.subject,
 				recipients: recipients,
 				last_email: c,
 				attachments:c.attachments
