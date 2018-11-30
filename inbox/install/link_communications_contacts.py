@@ -1,12 +1,15 @@
 from __future__ import unicode_literals
 import frappe
+
 def execute():
+	link_communications_contacts()
+
+def link_communications_contacts():
 	frappe.db.sql("update `tabContact` set email_id = lower(email_id)")
 	frappe.db.sql("update `tabCommunication` set sender = lower(sender),recipients = lower(recipients)")
 
-
 	origin_contact = frappe.db.sql("select name,email_id,supplier,supplier_name,customer,customer_name,user,organisation from `tabContact` where email_id <>''",as_dict=1)
-	origin_communication = frappe.db.sql("select name, sender,recipients,sent_or_received from `tabCommunication` where communication_type = 'Communication'",as_dict=1)
+	origin_communication = frappe.db.sql("select name, sender,recipients,sent_or_received from `tabCommunication` where communication_type = 'Communication' and communication_medium = 'Email'",as_dict=1)
 
 	for communication in origin_communication:
 		# format contacts
