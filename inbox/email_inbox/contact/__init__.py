@@ -7,6 +7,8 @@ def contact_update_communication_ref(self, method=None):
 
 	if self.email_id:
 		self.email_id = self.email_id.strip().lower()
+		if self.email_id == "":
+			self.email_id = None
 		comm = frappe._dict({"email_id": self.email_id,
 		                     "name": self.name,
 		                     "supplier": self.supplier,
