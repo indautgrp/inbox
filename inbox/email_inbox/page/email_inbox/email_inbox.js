@@ -28,7 +28,7 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		wrap = this;
 		this.wrapper = opts.wrapper;
 		this.filters = {};
-		this.page_length = 20;
+		this.page_length = 17;
 		this.start = 0;
 		this.cur_page = 1;
 		this.no_result_message = 'No Emails to Display';
@@ -751,8 +751,6 @@ frappe.Inbox = frappe.ui.Listing.extend({
 		})
 	},
 	update_local_flags:function(names,field,val){
-		console.log(names)
-		console.log(field)
 		frappe.call({
 			method: 'inbox.email_inbox.page.email_inbox.update_local_flags',
 			args:{
