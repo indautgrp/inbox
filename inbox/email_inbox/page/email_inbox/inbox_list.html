@@ -11,7 +11,7 @@
                         <a class="grey"  title="{%= sender %}">{%= sender %}</a>
                     </span>
                 </div>
-                <div class="col-sm-4 list-col text-ellipsis  col-xs-12">
+                <div class="col-sm-3 list-col text-ellipsis  col-xs-12">
                     <span class="list-value">
                         <a class="grey" title="{%= data.name %}">{%= data.subject %}</a>
                     </span>
@@ -37,9 +37,9 @@
                         </span>
                     </span>
                 </div>
-                <div class="col-sm-1 list-col text-ellipsis  hidden-xs" >
+                <div class="col-sm-2 list-col text-ellipsis  hidden-xs" >
                     <span class="list-value">
-                        {%= comment_when(data.communication_date,true) %}
+                        {%= frappe.datetime.str_to_user ? frappe.datetime.str_to_user(data.communication_date) : data.communication_date %}
                     </span>
                 </div>
             </div>
